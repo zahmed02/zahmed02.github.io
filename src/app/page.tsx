@@ -11,7 +11,6 @@ import {
   FaEnvelope,
   FaPhone,
   FaMapMarkerAlt,
-  FaBirthdayCake,
   FaExternalLinkAlt,
   FaTimes,
 } from "react-icons/fa";
@@ -20,762 +19,668 @@ import { TbWorld } from "react-icons/tb";
 import Image from "next/image";
 
 export default function Page() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeNav, setActiveNav] = useState("home");
-  const [gradientIndex, setGradientIndex] = useState(0);
-  const [timeOfDay, setTimeOfDay] = useState("");
+  const [activeSection, setActiveSection] = useState("about");
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [currentColorIndex, setCurrentColorIndex] = useState(0);
 
-  // Background gradient rotation
-  const gradients = [
+  // Colors for pulsing background
+  const backgroundColors = [
     "from-gray-900 via-blue-900 to-gray-900",
-    "from-gray-900 via-purple-900 to-gray-900",
-    "from-gray-900 via-red-900 to-gray-900",
-    "from-gray-900 via-green-900 to-gray-900",
-    "from-gray-900 via-indigo-900 to-gray-900",
+    "from-gray-900 via-purple-900 to-indigo-900",
+    "from-gray-900 via-cyan-900 to-blue-900",
+    "from-gray-900 via-violet-900 to-purple-900",
+    "from-gray-900 via-slate-900 to-blue-900",
   ];
 
-  useEffect(() => {
-    // Rotate background gradient every 10 seconds
-    const interval = setInterval(() => {
-      setGradientIndex((prev) => (prev + 1) % gradients.length);
-    }, 10000);
+  const colorGradients = [
+    { start: "#111827", middle: "#1e3a8a", end: "#111827" },
+    { start: "#111827", middle: "#581c87", end: "#312e81" },
+    { start: "#111827", middle: "#164e63", end: "#1e3a8a" },
+    { start: "#111827", middle: "#4c1d95", end: "#581c87" },
+    { start: "#111827", middle: "#0f172a", end: "#1e3a8a" },
+  ];
 
-    // Set time-based greeting
-    const hour = new Date().getHours();
-    if (hour < 12) setTimeOfDay("Morning");
-    else if (hour < 18) setTimeOfDay("Afternoon");
-    else setTimeOfDay("Evening");
+  // Handle scroll to update active section
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = [
+        "about",
+        "education",
+        "experience",
+        "skills",
+        "certifications",
+        "contact",
+      ];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (
+            scrollPosition >= offsetTop &&
+            scrollPosition < offsetTop + offsetHeight
+          ) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Background color animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentColorIndex((prev) => (prev + 1) % backgroundColors.length);
+    }, 8000); // Change every 8 seconds
 
     return () => clearInterval(interval);
-  }, [gradients.length]);
+  }, []);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
+  // Smooth scroll to section
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setActiveNav(id);
+      window.scrollTo({
+        top: element.offsetTop - 80,
+        behavior: "smooth",
+      });
+      setActiveSection(sectionId);
     }
   };
 
-  const handleEmailClick = () => {
-    const subject = encodeURIComponent("Let's Connect - Portfolio Inquiry");
+  // Create mailto link with pre-filled content
+  const createEmailLink = () => {
+    const subject = encodeURIComponent("Contact from Portfolio - Zubair Ahmed");
     const body = encodeURIComponent(
-      `Hello Zubair,\n\nI came across your portfolio and would like to connect with you.\n\nBest regards,`
+      `Dear Zubair,\n\nI came across your portfolio and wanted to connect regarding...\n\nBest regards,\n[Your Name]`
     );
-    window.open(
-      `mailto:zahmad2812@gmail.com?subject=${subject}&body=${body}`,
-      "_blank"
-    );
+    return `mailto:zahmad2812@gmail.com?subject=${subject}&body=${body}`;
   };
 
   return (
     <>
-      {/* Image Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
-          <div className="relative max-w-4xl max-h-[90vh]">
-            <Image
-              src="/procom-event.jpg"
-              alt="Zubair Ahmed - Professional Photo"
-              width={3119}
-              height={4160}
-              className="rounded-lg object-contain max-h-[85vh]"
-              onClick={() => setIsModalOpen(false)}
-            />
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition-all"
-            >
-              <FaTimes size={24} />
-            </button>
-            <div className="text-center mt-4 text-white">
-              <p className="text-sm">
-                Click outside image or press ESC to close
-              </p>
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-gray-900 via-blue-900 to-gray-900 shadow-lg shadow-blue-900/50 border-b border-blue-700/50">
+        <div className="max-w-6xl mx-auto px-4 md:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              Zubair Ahmed
+            </div>
+
+            <div className="flex space-x-1 md:space-x-2">
+              {[
+                "about",
+                "education",
+                "experience",
+                "skills",
+                "certifications",
+                "contact",
+              ].map((section) => (
+                <button
+                  key={section}
+                  onClick={() => scrollToSection(section)}
+                  className={`px-3 py-2 text-sm md:text-base font-medium rounded-lg transition-all duration-300 ${
+                    activeSection === section
+                      ? "bg-blue-800 text-white shadow-lg shadow-blue-500/50"
+                      : "text-gray-300 hover:bg-blue-800/50 hover:text-white"
+                  }`}
+                >
+                  {section.charAt(0).toUpperCase() + section.slice(1)}
+                </button>
+              ))}
             </div>
           </div>
         </div>
-      )}
+      </nav>
 
-      {/* Pulsing Background Effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {[...Array(5)].map((_, i) => (
+      {/* Main Content */}
+      <div className="min-h-screen text-white p-4 md:p-8 pt-24">
+        {/* Animated Background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div
-            key={i}
-            className={`absolute w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse`}
+            className={`absolute inset-0 bg-gradient-to-br transition-all duration-5000 ${backgroundColors[currentColorIndex]}`}
             style={{
-              top: `${20 + i * 15}%`,
-              left: `${i * 20}%`,
-              backgroundColor:
-                i % 3 === 0 ? "#1e40af" : i % 3 === 1 ? "#991b1b" : "#4c1d95",
-              animationDelay: `${i * 2}s`,
-              animationDuration: `${8 + i * 2}s`,
+              background: `linear-gradient(135deg, ${colorGradients[currentColorIndex].start} 0%, ${colorGradients[currentColorIndex].middle} 50%, ${colorGradients[currentColorIndex].end} 100%)`,
+              animation: "pulse 10s ease-in-out infinite",
             }}
           />
-        ))}
-      </div>
 
-      {/* Animated Gradient Background */}
-      <div
-        className={`min-h-screen bg-gradient-to-br transition-all duration-5000 ${gradients[gradientIndex]} text-white`}
-      >
+          {/* Enhanced Blob Effects */}
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+
+          {/* Additional floating particles */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-cyan-400/30 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${10 + Math.random() * 10}s`,
+              }}
+            />
+          ))}
+        </div>
+
         <div className="relative z-10 max-w-6xl mx-auto">
-          {/* Fixed Navigation Bar */}
-          <nav className="sticky top-0 z-40 bg-gradient-to-r from-black/90 via-blue-900/90 to-black/90 backdrop-blur-md border-b border-blue-500/30 shadow-xl">
-            <div className="max-w-6xl mx-auto px-4 py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"></div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                    Zubair Ahmed
-                  </h1>
-                </div>
+          {/* Hero Section */}
+          <section className="mb-16 flex flex-col md:flex-row items-center gap-8">
+            {/* Image with hover effect */}
+            <div
+              className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500 hover:shadow-xl cursor-pointer group transition-all duration-300 hover:scale-105"
+              onClick={() => setImageModalOpen(true)}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-800/20 z-10"></div>
+              <Image
+                src="/procom-event.jpg"
+                alt="Zubair Ahmed - Professional Photo"
+                fill
+                className="object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
+                priority
+                sizes="(max-width: 768px) 12rem, 14rem"
+              />
 
-                <div className="hidden md:flex items-center space-x-6">
-                  {[
-                    "About",
-                    "Education",
-                    "Experience",
-                    "Skills",
-                    "Certifications",
-                    "Contact",
-                  ].map((item) => (
-                    <button
-                      key={item}
-                      onClick={() => scrollToSection(item.toLowerCase())}
-                      className={`relative px-4 py-2 rounded-lg transition-all duration-300 group ${
-                        activeNav === item.toLowerCase()
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
-                          : "text-gray-300 hover:text-white hover:bg-blue-800/50"
-                      }`}
-                    >
-                      {item}
-                      <span
-                        className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${
-                          activeNav === item.toLowerCase()
-                            ? "w-full"
-                            : "w-0 group-hover:w-full"
-                        }`}
-                      />
-                    </button>
-                  ))}
-                </div>
-
-                <div className="md:hidden">
-                  <button className="text-white">
-                    <svg
-                      className="w-6 h-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 6h16M4 12h16M4 18h16"
-                      />
-                    </svg>
-                  </button>
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 z-20">
+                <div className="text-center">
+                  <FaExternalLinkAlt className="text-4xl text-cyan-400 mx-auto mb-2" />
+                  <p className="text-white font-semibold">
+                    Click to view full image
+                  </p>
+                  <p className="text-gray-300 text-sm mt-1">(Opens in modal)</p>
                 </div>
               </div>
             </div>
-          </nav>
 
-          <div className="p-4 md:p-8">
-            {/* Hero Section */}
-            <section className="mb-16 flex flex-col md:flex-row items-center gap-8 pt-8">
-              <div
-                className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/50 cursor-pointer group"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-800/20 z-10 group-hover:opacity-0 transition-opacity duration-300"></div>
-                <Image
-                  src="/procom-event.jpg"
-                  alt="Zubair Ahmed - Professional Photo"
-                  fill
-                  className="object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
-                  priority
-                  sizes="(max-width: 768px) 12rem, 14rem"
-                />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all duration-300 z-20">
-                  <div className="text-center transform -translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    <FaExternalLinkAlt className="text-4xl text-white mx-auto mb-2" />
-                    <span className="text-white font-semibold">
-                      Click to View
-                    </span>
-                  </div>
-                </div>
-                <div className="absolute -bottom-2 -right-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs px-3 py-1 rounded-full shadow-lg animate-pulse">
-                  Hover to view
-                </div>
-              </div>
+            <div className="flex-1">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                Systems Software Engineer &
+                <span className="block bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent animate-gradient">
+                  Full-Stack Developer
+                </span>
+              </h1>
+              <p className="text-gray-300 mb-6">
+                CS undergrad proficient in database management, system-level
+                applications, game engines, automation tools, & simulators.
+                Skilled in high & low-level programming. Focused on building
+                efficient, scalable low-level solutions.
+              </p>
 
-              <div className="flex-1">
-                <div className="inline-block bg-gradient-to-r from-cyan-800/30 to-blue-800/30 backdrop-blur-sm px-4 py-1 rounded-full mb-4">
-                  <span className="text-sm">Good {timeOfDay}! 🌟</span>
-                </div>
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  Systems Software Engineer &
-                  <span className="block bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent animate-pulse">
-                    Full-Stack Developer
-                  </span>
-                </h2>
-                <p className="text-gray-300 mb-4">
-                  Born on{" "}
-                  <span className="text-cyan-300 font-semibold">
-                    28 December
-                  </span>
-                  . CS undergrad proficient in database management, system-level
-                  applications, game engines, automation tools, &amp;
-                  simulators. Skilled in high &amp; low-level programming.
-                  Focused on building efficient, scalable low-level solutions.
-                </p>
-
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <FaBirthdayCake className="text-cyan-400" />
-                    <span>28 Dec</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <FaMapMarkerAlt className="text-cyan-400" />
-                    <span>Karachi, Pakistan</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-4">
-                  <a
-                    href="https://linkedin.com/in/zubair-ahmed-448041344"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 px-4 py-3 rounded-lg transition-all hover:scale-105 shadow-lg shadow-blue-500/30"
-                  >
-                    <FaLinkedin /> LinkedIn
-                  </a>
-                  <a
-                    href="https://github.com/zahmed02"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-3 rounded-lg transition-all hover:scale-105 shadow-lg shadow-gray-500/30"
-                  >
-                    <FaGithub /> GitHub
-                  </a>
-                  <button
-                    onClick={handleEmailClick}
-                    className="flex items-center gap-2 bg-gradient-to-r from-cyan-700 to-blue-700 hover:from-cyan-600 hover:to-blue-600 px-4 py-3 rounded-lg transition-all hover:scale-105 shadow-lg shadow-cyan-500/30"
-                  >
-                    <FaEnvelope /> Email Me
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            {/* About Section */}
-            <section id="about" className="mb-16">
-              <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <FaGraduationCap className="text-cyan-400" />
-                About Me
-              </h2>
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-cyan-500 transition-all hover:scale-[1.02] shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Background
-                  </h3>
-                  <p className="text-gray-300">
-                    Born on December 28th, currently pursuing BS in Computer
-                    Science at FAST-NUCES Karachi. Passionate about systems
-                    programming, database management, and building efficient
-                    software solutions. Experienced in both high-level and
-                    low-level programming with a focus on performance
-                    optimization.
-                  </p>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all hover:scale-[1.02] shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Contact Info
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors cursor-pointer group">
-                      <div className="bg-blue-900/50 p-2 rounded-lg group-hover:bg-blue-700 transition-colors">
-                        <FaPhone className="text-cyan-400" />
-                      </div>
-                      <span>+92-320-3060747</span>
-                    </div>
-                    <button
-                      onClick={handleEmailClick}
-                      className="flex items-center gap-3 hover:text-cyan-300 transition-colors w-full text-left group"
-                    >
-                      <div className="bg-cyan-900/50 p-2 rounded-lg group-hover:bg-cyan-700 transition-colors">
-                        <FaEnvelope className="text-cyan-400" />
-                      </div>
-                      <span>zahmad2812@gmail.com</span>
-                    </button>
-                    <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors cursor-pointer group">
-                      <div className="bg-purple-900/50 p-2 rounded-lg group-hover:bg-purple-700 transition-colors">
-                        <FaMapMarkerAlt className="text-cyan-400" />
-                      </div>
-                      <span>Karachi, Sindh 75290</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Education Section */}
-            <section id="education" className="mb-16">
-              <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <FaGraduationCap className="text-cyan-400" />
-                Education
-              </h2>
-              <div className="space-y-6">
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border-l-4 border-cyan-500 hover:border-cyan-400 transition-all hover:scale-[1.01] shadow-lg hover:shadow-cyan-500/20">
-                  <h3 className="text-xl font-semibold">
-                    Bachelor of Science in Computer Science
-                  </h3>
-                  <p className="text-cyan-300">FAST-NUCES, Karachi</p>
-                  <p className="text-gray-400">Sep 2023 – Jun 2027</p>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border-l-4 border-blue-500 hover:border-blue-400 transition-all hover:scale-[1.01] shadow-lg hover:shadow-blue-500/20">
-                  <h3 className="text-xl font-semibold">
-                    IGCSE A Levels (Mathematics &amp; CS)
-                  </h3>
-                  <p className="text-cyan-300">Cedar College, Karachi</p>
-                  <p className="text-gray-400">Oct 2022 – Jun 2023</p>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border-l-4 border-purple-500 hover:border-purple-400 transition-all hover:scale-[1.01] shadow-lg hover:shadow-purple-500/20">
-                  <h3 className="text-xl font-semibold">
-                    IGCSE O Levels (General Studies)
-                  </h3>
-                  <p className="text-cyan-300">
-                    Montessori Complex Cambridge School (MCCS), Karachi
-                  </p>
-                  <p className="text-gray-400">
-                    May 2019 – Jun 2020 | Score: 2A*, 5A
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            {/* Experience Section */}
-            <section id="experience" className="mb-16">
-              <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <FaBriefcase className="text-cyan-400" />
-                Experience
-              </h2>
-              <div className="space-y-6">
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 hover:shadow-xl transition-all hover:scale-[1.01] border border-gray-700 hover:border-cyan-500/50">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-semibold">
-                        Web Development Intern
-                      </h3>
-                      <p className="text-cyan-300">HUM Network Ltd</p>
-                    </div>
-                    <span className="bg-gradient-to-r from-cyan-900 to-cyan-700 text-cyan-300 px-3 py-1 rounded-full text-sm animate-pulse">
-                      June 2025 – July 2025
-                    </span>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                    <li>
-                      Built responsive full-stack websites with interactive UIs,
-                      CRUD functionality
-                    </li>
-                    <li>
-                      Implemented relational database schemas and session-based
-                      authentication
-                    </li>
-                    <li>
-                      Designed RESTful APIs for data exchange across various
-                      systems
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 hover:shadow-xl transition-all hover:scale-[1.01] border border-gray-700 hover:border-blue-500/50">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-semibold">
-                        Undergraduate Teaching Assistant
-                      </h3>
-                      <p className="text-cyan-300">FAST-NUCES</p>
-                    </div>
-                    <span className="bg-gradient-to-r from-blue-900 to-blue-700 text-blue-300 px-3 py-1 rounded-full text-sm animate-pulse">
-                      Feb 2025 – May 2025
-                    </span>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                    <li>Assisted in teaching MT-1008 Multivariate Calculus</li>
-                    <li>
-                      Assisted in teaching SS-1013 Ideology &amp; Constitution
-                      of Pakistan
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 hover:shadow-xl transition-all hover:scale-[1.01] border border-gray-700 hover:border-purple-500/50">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-semibold">
-                        Assessment Management &amp; Technical Operations
-                      </h3>
-                      <p className="text-cyan-300">
-                        PROCOM &amp; Developer&apos;s Day
-                      </p>
-                    </div>
-                    <span className="bg-gradient-to-r from-purple-900 to-purple-700 text-purple-300 px-3 py-1 rounded-full text-sm animate-pulse">
-                      Feb 2025 – Apr 2025
-                    </span>
-                  </div>
-                  <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
-                    <li>Designed competitive programming problems and MCQs</li>
-                    <li>Managed technical logistics and server setup</li>
-                    <li>Performed live troubleshooting during events</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-
-            {/* Skills Section */}
-            <section id="skills" className="mb-16">
-              <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <FaCode className="text-cyan-400" />
-                Technical Skills
-              </h2>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-all hover:scale-[1.02] hover:shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Languages
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "C/C++",
-                      "C#",
-                      "Python",
-                      "Java",
-                      "JavaScript/TypeScript",
-                      "Go",
-                      "R",
-                      "Assembly(x86)",
-                      "Bash/Shell",
-                    ].map((skill) => (
-                      <span
-                        key={skill}
-                        className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded-full text-sm transition-all cursor-default hover:scale-105"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-blue-600 transition-all hover:scale-[1.02] hover:shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Databases
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {["SQL", "MongoDB", "PostgreSQL", "MySQL", "NoSQL"].map(
-                      (skill) => (
-                        <span
-                          key={skill}
-                          className="bg-blue-900/50 hover:bg-blue-800 px-3 py-1 rounded-full text-sm transition-all cursor-default hover:scale-105"
-                        >
-                          {skill}
-                        </span>
-                      )
-                    )}
-                  </div>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-purple-600 transition-all hover:scale-[1.02] hover:shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Web Technologies
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "HTML",
-                      "CSS",
-                      "TailwindCSS",
-                      "React",
-                      "Next.js",
-                      "PHP",
-                      "jQuery",
-                    ].map((skill) => (
-                      <span
-                        key={skill}
-                        className="bg-purple-900/50 hover:bg-purple-800 px-3 py-1 rounded-full text-sm transition-all cursor-default hover:scale-105"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-green-600 transition-all hover:scale-[1.02] hover:shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Data Science &amp; ML
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Pandas",
-                      "NumPy",
-                      "Scikit-Learn",
-                      "R",
-                      "dplyr",
-                      "ggplot2",
-                      "tidyr",
-                    ].map((skill) => (
-                      <span
-                        key={skill}
-                        className="bg-green-900/50 hover:bg-green-800 px-3 py-1 rounded-full text-sm transition-all cursor-default hover:scale-105"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-yellow-600 transition-all hover:scale-[1.02] hover:shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Infrastructure &amp; Tools
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Ubuntu-Linux",
-                      "Git",
-                      "LaTeX",
-                      "Irvine32",
-                      "System Design",
-                    ].map((skill) => (
-                      <span
-                        key={skill}
-                        className="bg-yellow-900/50 hover:bg-yellow-800 px-3 py-1 rounded-full text-sm transition-all cursor-default hover:scale-105"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-red-600 transition-all hover:scale-[1.02] hover:shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    Core Concepts
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "OOP",
-                      "Functional Programming",
-                      "Data Structures",
-                      "Algorithms",
-                      "LLMs",
-                      "AI/ML",
-                      "Cybersecurity",
-                    ].map((skill) => (
-                      <span
-                        key={skill}
-                        className="bg-red-900/50 hover:bg-red-800 px-3 py-1 rounded-full text-sm transition-all cursor-default hover:scale-105"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* Certifications Section */}
-            <section id="certifications" className="mb-16">
-              <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <FaCertificate className="text-cyan-400" />
-                Certifications &amp; Learning Platforms
-              </h2>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a
-                  href="https://codesignal.com/learn/course-paths"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-cyan-500 transition-all hover:scale-[1.03] shadow-lg hover:shadow-cyan-500/30 group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <SiCodesignal className="text-4xl text-orange-500 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-xl font-semibold">CodeSignal</h3>
-                  </div>
-                  <p className="text-gray-300">
-                    Programming courses and certification paths
-                  </p>
-                </a>
-
-                <a
-                  href="https://www.sololearn.com/en/profile/27122128"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all hover:scale-[1.03] shadow-lg hover:shadow-blue-500/30 group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <SiSololearn className="text-4xl text-blue-500 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-xl font-semibold">SoloLearn</h3>
-                  </div>
-                  <p className="text-gray-300">
-                    Interactive coding tutorials and certifications
-                  </p>
-                </a>
-
-                <a
-                  href="https://skillshop.docebosaas.com/learn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-green-500 transition-all hover:scale-[1.03] shadow-lg hover:shadow-green-500/30 group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <TbWorld className="text-4xl text-green-500 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-xl font-semibold">Google Skillshop</h3>
-                  </div>
-                  <p className="text-gray-300">
-                    Google&apos;s official certification platform
-                  </p>
-                </a>
-
-                <a
-                  href="https://www.life-global.org/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all hover:scale-[1.03] shadow-lg hover:shadow-purple-500/30 group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <TbWorld className="text-4xl text-purple-500 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-xl font-semibold">LIFE Global</h3>
-                  </div>
-                  <p className="text-gray-300">
-                    Leadership and professional development
-                  </p>
-                </a>
-
-                <a
-                  href="https://www.hackerrank.com/dashboard"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-emerald-500 transition-all hover:scale-[1.03] shadow-lg hover:shadow-emerald-500/30 group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <SiHackerrank className="text-4xl text-emerald-500 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-xl font-semibold">HackerRank</h3>
-                  </div>
-                  <p className="text-gray-300">
-                    Coding challenges and skill assessments
-                  </p>
-                </a>
-
-                <a
-                  href="https://www.netacad.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-red-500 transition-all hover:scale-[1.03] shadow-lg hover:shadow-red-500/30 group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <TbWorld className="text-4xl text-red-500 group-hover:scale-110 transition-transform" />
-                    <h3 className="text-xl font-semibold">Cisco NetAcad</h3>
-                  </div>
-                  <p className="text-gray-300">
-                    Networking and IT certifications
-                  </p>
-                </a>
-              </div>
-            </section>
-
-            {/* Contact Section */}
-            <section id="contact" className="mb-16">
-              <h2 className="text-3xl font-bold mb-8">Get In Touch</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                <button
-                  onClick={handleEmailClick}
-                  className="bg-gradient-to-r from-cyan-800/30 to-blue-800/30 backdrop-blur-sm rounded-xl p-6 text-center hover:from-cyan-800/50 hover:to-blue-800/50 transition-all hover:scale-105 shadow-lg hover:shadow-cyan-500/30 group"
-                >
-                  <FaEnvelope className="text-4xl mx-auto mb-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-                  <h3 className="text-xl font-semibold mb-2">Email</h3>
-                  <p className="text-gray-300 group-hover:text-white transition-colors">
-                    zahmad2812@gmail.com
-                  </p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    Opens your email client
-                  </p>
-                </button>
-
+              <div className="flex flex-wrap gap-4">
                 <a
                   href="https://linkedin.com/in/zubair-ahmed-448041344"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-blue-800/30 to-sky-800/30 backdrop-blur-sm rounded-xl p-6 text-center hover:from-blue-800/50 hover:to-sky-800/50 transition-all hover:scale-105 shadow-lg hover:shadow-blue-500/30 group"
+                  className="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50"
                 >
-                  <FaLinkedin className="text-4xl mx-auto mb-4 text-blue-400 group-hover:scale-110 transition-transform" />
-                  <h3 className="text-xl font-semibold mb-2">LinkedIn</h3>
-                  <p className="text-gray-300 group-hover:text-white transition-colors">
-                    Connect professionally
-                  </p>
+                  <FaLinkedin /> LinkedIn
                 </a>
-
                 <a
                   href="https://github.com/zahmed02"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-gray-800/30 to-slate-800/30 backdrop-blur-sm rounded-xl p-6 text-center hover:from-gray-800/50 hover:to-slate-800/50 transition-all hover:scale-105 shadow-lg hover:shadow-gray-500/30 group"
+                  className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gray-500/50"
                 >
-                  <FaGithub className="text-4xl mx-auto mb-4 text-white group-hover:scale-110 transition-transform" />
-                  <h3 className="text-xl font-semibold mb-2">GitHub</h3>
-                  <p className="text-gray-300 group-hover:text-white transition-colors">
-                    View my projects
-                  </p>
+                  <FaGithub /> GitHub
+                </a>
+                <a
+                  href={createEmailLink()}
+                  className="flex items-center gap-2 bg-cyan-700 hover:bg-cyan-600 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50"
+                >
+                  <FaEnvelope /> Email Me
                 </a>
               </div>
-            </section>
+            </div>
+          </section>
 
-            {/* Footer */}
-            <footer className="mt-16 pt-8 border-t border-gray-700/50 text-center text-gray-400">
-              <div className="bg-gradient-to-r from-black/30 via-blue-900/30 to-black/30 backdrop-blur-sm rounded-xl p-6">
-                <p className="text-lg">
-                  © {new Date().getFullYear()} Zubair Ahmed. All rights
-                  reserved.
+          {/* About Section */}
+          <section id="about" className="mb-16 scroll-mt-24">
+            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
+              <FaGraduationCap className="text-cyan-400 animate-pulse" />
+              About Me
+            </h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-cyan-500/20">
+                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
+                  Background
+                </h3>
+                <p className="text-gray-300">
+                  Currently pursuing BS in Computer Science at FAST-NUCES
+                  Karachi. Passionate about systems programming, database
+                  management, and building efficient software solutions.
+                  Experienced in both high-level and low-level programming with
+                  a focus on performance optimization.
                 </p>
-                <p className="mt-2 text-gray-300">
-                  Born on <span className="text-cyan-300">28 December</span> •
-                  Computer Science Student • Aspiring Systems Engineer
-                </p>
-                <p className="mt-2">
-                  Built with Next.js &amp; Tailwind CSS | Deployed on GitHub
-                  Pages
-                </p>
-                <div className="mt-6 flex justify-center space-x-6">
+              </div>
+
+              <div className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:scale-[1.02] shadow-xl hover:shadow-blue-500/20">
+                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
+                  Contact Info
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors">
+                    <FaPhone className="text-cyan-400" />
+                    <span>+92-320-3060747</span>
+                  </div>
                   <a
-                    href="https://github.com/zahmed02/zahmed02.github.io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-white transition-colors hover:scale-110"
+                    href={createEmailLink()}
+                    className="flex items-center gap-3 hover:text-cyan-300 transition-colors group"
                   >
-                    Source Code
+                    <FaEnvelope className="text-cyan-400 group-hover:animate-bounce" />
+                    <span className="group-hover:underline">
+                      zahmad2812@gmail.com
+                    </span>
                   </a>
-                  <a
-                    href="/resume.pdf"
-                    className="hover:text-white transition-colors hover:scale-110"
-                  >
-                    Download Resume
-                  </a>
-                  <button
-                    onClick={() =>
-                      window.scrollTo({ top: 0, behavior: "smooth" })
-                    }
-                    className="hover:text-cyan-300 transition-colors hover:scale-110"
-                  >
-                    Back to Top ↑
-                  </button>
+                  <div className="flex items-center gap-3 hover:text-cyan-300 transition-colors">
+                    <FaMapMarkerAlt className="text-cyan-400" />
+                    <span>Karachi, Sindh 75290</span>
+                  </div>
                 </div>
               </div>
-            </footer>
-          </div>
+            </div>
+          </section>
+
+          {/* Education Section */}
+          <section id="education" className="mb-16 scroll-mt-24">
+            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
+              <FaGraduationCap className="text-cyan-400" />
+              Education
+            </h2>
+            <div className="space-y-6">
+              {[
+                {
+                  title: "Bachelor of Science in Computer Science",
+                  institution: "FAST-NUCES, Karachi",
+                  period: "Sep 2023 – Jun 2027",
+                  borderColor: "border-cyan-500",
+                  bgColor: "hover:bg-cyan-900/20",
+                },
+                {
+                  title: "IGCSE A Levels (Mathematics & CS)",
+                  institution: "Cedar College, Karachi",
+                  period: "Oct 2022 – Jun 2023",
+                  borderColor: "border-blue-500",
+                  bgColor: "hover:bg-blue-900/20",
+                },
+                {
+                  title: "IGCSE O Levels (General Studies)",
+                  institution:
+                    "Montessori Complex Cambridge School (MCCS), Karachi",
+                  period: "May 2019 – Jun 2020 | Score: 2A*, 5A",
+                  borderColor: "border-purple-500",
+                  bgColor: "hover:bg-purple-900/20",
+                },
+              ].map((edu, index) => (
+                <div
+                  key={index}
+                  className={`bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border-l-4 ${edu.borderColor} transition-all duration-300 hover:scale-[1.01] ${edu.bgColor} shadow-lg hover:shadow-xl`}
+                >
+                  <h3 className="text-xl font-semibold">{edu.title}</h3>
+                  <p className="text-cyan-300">{edu.institution}</p>
+                  <p className="text-gray-400">{edu.period}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Experience Section */}
+          <section id="experience" className="mb-16 scroll-mt-24">
+            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
+              <FaBriefcase className="text-cyan-400" />
+              Experience
+            </h2>
+            <div className="space-y-6">
+              {[
+                {
+                  title: "Web Development Intern",
+                  company: "HUM Network Ltd",
+                  period: "June 2025 – July 2025",
+                  color: "cyan",
+                  points: [
+                    "Built responsive full-stack websites with interactive UIs, CRUD functionality",
+                    "Implemented relational database schemas and session-based authentication",
+                    "Designed RESTful APIs for data exchange across various systems",
+                  ],
+                },
+                {
+                  title: "Undergraduate Teaching Assistant",
+                  company: "FAST-NUCES",
+                  period: "Feb 2025 – May 2025",
+                  color: "blue",
+                  points: [
+                    "Assisted in teaching MT-1008 Multivariate Calculus",
+                    "Assisted in teaching SS-1013 Ideology & Constitution of Pakistan",
+                  ],
+                },
+                {
+                  title: "Assessment Management & Technical Operations",
+                  company: "PROCOM & Developer's Day",
+                  period: "Feb 2025 – Apr 2025",
+                  color: "purple",
+                  points: [
+                    "Designed competitive programming problems and MCQs",
+                    "Managed technical logistics and server setup",
+                    "Performed live troubleshooting during events",
+                  ],
+                },
+              ].map((exp, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 transition-all duration-300 hover:scale-[1.01] shadow-lg hover:shadow-xl border border-gray-700/50 hover:border-cyan-500/50"
+                >
+                  <div className="flex flex-col md:flex-row justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-semibold">{exp.title}</h3>
+                      <p className="text-cyan-300">{exp.company}</p>
+                    </div>
+                    <span
+                      className={`bg-${exp.color}-900 text-${exp.color}-300 px-3 py-1 rounded-full text-sm mt-2 md:mt-0`}
+                    >
+                      {exp.period}
+                    </span>
+                  </div>
+                  <ul className="space-y-2 text-gray-300">
+                    {exp.points.map((point, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-2 group hover:text-white transition-colors"
+                      >
+                        <span className="text-cyan-400 mt-1">▸</span>
+                        <span className="group-hover:translate-x-1 transition-transform">
+                          {point}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Skills Section */}
+          <section id="skills" className="mb-16 scroll-mt-24">
+            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
+              <FaCode className="text-cyan-400" />
+              Technical Skills
+            </h2>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  title: "Languages",
+                  skills: [
+                    "C/C++",
+                    "C#",
+                    "Python",
+                    "Java",
+                    "JavaScript/TypeScript",
+                    "Go",
+                    "R",
+                    "Assembly(x86)",
+                    "Bash/Shell",
+                  ],
+                  color: "gray",
+                },
+                {
+                  title: "Databases",
+                  skills: ["SQL", "MongoDB", "PostgreSQL", "MySQL", "NoSQL"],
+                  color: "blue",
+                },
+                {
+                  title: "Web Technologies",
+                  skills: [
+                    "HTML",
+                    "CSS",
+                    "TailwindCSS",
+                    "React",
+                    "Next.js",
+                    "PHP",
+                    "jQuery",
+                  ],
+                  color: "purple",
+                },
+                {
+                  title: "Data Science & ML",
+                  skills: [
+                    "Pandas",
+                    "NumPy",
+                    "Scikit-Learn",
+                    "R",
+                    "dplyr",
+                    "ggplot2",
+                    "tidyr",
+                  ],
+                  color: "green",
+                },
+                {
+                  title: "Infrastructure & Tools",
+                  skills: [
+                    "Ubuntu-Linux",
+                    "Git",
+                    "LaTeX",
+                    "Irvine32",
+                    "System Design",
+                  ],
+                  color: "yellow",
+                },
+                {
+                  title: "Core Concepts",
+                  skills: [
+                    "OOP",
+                    "Functional Programming",
+                    "Data Structures",
+                    "Algorithms",
+                    "LLMs",
+                    "AI/ML",
+                    "Cybersecurity",
+                  ],
+                  color: "red",
+                },
+              ].map((category, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                >
+                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
+                    {category.title}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {category.skills.map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className={`bg-${category.color}-900/50 hover:bg-${category.color}-700 px-3 py-1 rounded-full text-sm cursor-default transition-all duration-300 hover:scale-105`}
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Certifications Section */}
+          <section id="certifications" className="mb-16 scroll-mt-24">
+            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
+              <FaCertificate className="text-cyan-400" />
+              Certifications & Learning Platforms
+            </h2>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  href: "https://codesignal.com/learn/course-paths",
+                  icon: <SiCodesignal className="text-4xl text-orange-500" />,
+                  title: "CodeSignal",
+                  desc: "Programming courses and certification paths",
+                  color: "orange",
+                },
+                {
+                  href: "https://www.sololearn.com/en/profile/27122128",
+                  icon: <SiSololearn className="text-4xl text-blue-500" />,
+                  title: "SoloLearn",
+                  desc: "Interactive coding tutorials and certifications",
+                  color: "blue",
+                },
+                {
+                  href: "https://skillshop.docebosaas.com/learn",
+                  icon: <TbWorld className="text-4xl text-green-500" />,
+                  title: "Google Skillshop",
+                  desc: "Google's official certification platform",
+                  color: "green",
+                },
+                {
+                  href: "https://www.life-global.org/",
+                  icon: <TbWorld className="text-4xl text-purple-500" />,
+                  title: "LIFE Global",
+                  desc: "Leadership and professional development",
+                  color: "purple",
+                },
+                {
+                  href: "https://www.hackerrank.com/dashboard",
+                  icon: <SiHackerrank className="text-4xl text-emerald-500" />,
+                  title: "HackerRank",
+                  desc: "Coding challenges and skill assessments",
+                  color: "emerald",
+                },
+                {
+                  href: "https://www.netacad.com/",
+                  icon: <TbWorld className="text-4xl text-red-500" />,
+                  title: "Cisco NetAcad",
+                  desc: "Networking and IT certifications",
+                  color: "red",
+                },
+              ].map((platform, index) => (
+                <a
+                  key={index}
+                  href={platform.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gray-800/30 backdrop-blur-lg rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500 transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-xl group"
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="group-hover:scale-110 transition-transform duration-300">
+                      {platform.icon}
+                    </div>
+                    <h3 className="text-xl font-semibold group-hover:text-cyan-300 transition-colors">
+                      {platform.title}
+                    </h3>
+                  </div>
+                  <p className="text-gray-300 group-hover:text-white transition-colors">
+                    {platform.desc}
+                  </p>
+                </a>
+              ))}
+            </div>
+          </section>
+
+          {/* Contact Section */}
+          <section id="contact" className="mb-16 scroll-mt-24">
+            <h2 className="text-3xl font-bold mb-8">Get In Touch</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              <a
+                href={createEmailLink()}
+                className="bg-gradient-to-r from-cyan-800/30 to-blue-800/30 rounded-xl p-6 text-center hover:from-cyan-800/50 hover:to-blue-800/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/50 border border-cyan-700/30 hover:border-cyan-500/70"
+              >
+                <FaEnvelope className="text-4xl mx-auto mb-4 text-cyan-400 animate-pulse" />
+                <h3 className="text-xl font-semibold mb-2">Email</h3>
+                <p className="text-gray-300">zahmad2812@gmail.com</p>
+                <p className="text-sm text-cyan-300 mt-2">
+                  Click to compose email
+                </p>
+              </a>
+
+              <a
+                href="https://linkedin.com/in/zubair-ahmed-448041344"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-blue-800/30 to-sky-800/30 rounded-xl p-6 text-center hover:from-blue-800/50 hover:to-sky-800/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/50 border border-blue-700/30 hover:border-blue-500/70"
+              >
+                <FaLinkedin className="text-4xl mx-auto mb-4 text-blue-400" />
+                <h3 className="text-xl font-semibold mb-2">LinkedIn</h3>
+                <p className="text-gray-300">Connect professionally</p>
+              </a>
+
+              <a
+                href="https://github.com/zahmed02"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-gray-800/30 to-slate-800/30 rounded-xl p-6 text-center hover:from-gray-800/50 hover:to-slate-800/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gray-500/50 border border-gray-700/30 hover:border-gray-500/70"
+              >
+                <FaGithub className="text-4xl mx-auto mb-4 text-white" />
+                <h3 className="text-xl font-semibold mb-2">GitHub</h3>
+                <p className="text-gray-300">View my projects</p>
+              </a>
+            </div>
+          </section>
+
+          {/* Footer */}
+          <footer className="mt-16 pt-8 border-t border-gray-700/50 text-center text-gray-400">
+            <p>
+              © {new Date().getFullYear()} Zubair Ahmed. All rights reserved.
+            </p>
+            <p className="mt-2">
+              Built with Next.js & Tailwind CSS | Deployed on GitHub Pages
+            </p>
+            <div className="mt-4 flex justify-center space-x-6">
+              <a
+                href="https://github.com/zahmed02/zahmed02.github.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors hover:underline"
+              >
+                Source Code
+              </a>
+              <a
+                href="/resume.pdf"
+                className="hover:text-white transition-colors hover:underline"
+              >
+                Download Resume
+              </a>
+            </div>
+          </footer>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {imageModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setImageModalOpen(false)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute -top-12 right-0 text-white hover:text-cyan-400 transition-colors"
+              onClick={() => setImageModalOpen(false)}
+            >
+              <FaTimes className="text-3xl" />
+            </button>
+            <div className="relative w-full h-[80vh] rounded-lg overflow-hidden shadow-2xl">
+              <Image
+                src="/procom-event.jpg"
+                alt="Zubair Ahmed - Full Size"
+                fill
+                className="object-contain"
+                sizes="100vw"
+              />
+            </div>
+            <p className="text-white text-center mt-4">
+              Click outside to close
+            </p>
+          </div>
+        </div>
+      )}
     </>
   );
 }
