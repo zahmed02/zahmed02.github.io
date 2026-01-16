@@ -53,18 +53,16 @@ export default function Page() {
 
         {/* Hero Section */}
         <section className="mb-16 flex flex-col md:flex-row items-center gap-8">
-          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/30 relative">
+          <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/30">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-800/20 z-10"></div>
             <Image
               src="/procom-event.jpg"
-              alt="Zubair Ahmed at PROCOM Event"
-              width={224}
-              height={224}
-              className="w-full h-full object-cover object-center"
+              alt="Zubair Ahmed - Professional Photo"
+              fill
+              className="object-cover rounded-full"
               priority
-              unoptimized // Since we're using GitHub Pages with static export
+              sizes="(max-width: 768px) 12rem, 14rem"
             />
-            {/* Gradient overlay for better visibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
           </div>
 
           <div className="flex-1">
