@@ -53,8 +53,18 @@ export default function Page() {
 
         {/* Hero Section */}
         <section className="mb-16 flex flex-col md:flex-row items-center gap-8">
-          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/30 flex items-center justify-center bg-gradient-to-br from-cyan-600 to-blue-800">
-            <span className="text-5xl font-bold text-white">ZA</span>
+          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/30 relative">
+            <Image
+              src="/procom-event.jpg"
+              alt="Zubair Ahmed at PROCOM Event"
+              width={224}
+              height={224}
+              className="w-full h-full object-cover object-center"
+              priority
+              unoptimized // Since we're using GitHub Pages with static export
+            />
+            {/* Gradient overlay for better visibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
           </div>
 
           <div className="flex-1">
@@ -251,27 +261,6 @@ export default function Page() {
                 <li>Managed technical logistics and server setup</li>
                 <li>Performed live troubleshooting during events</li>
               </ul>
-
-              {/* PROCOM Event Image */}
-              <div className="mt-6 pt-6 border-t border-gray-700">
-                <h4 className="text-lg font-semibold mb-4 text-cyan-300">
-                  Event Photo
-                </h4>
-                <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-600 shadow-lg">
-                  <Image
-                    src="/procom-event.jpg"
-                    alt="PROCOM Event - Technical Operations Team"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 800px"
-                    priority={false}
-                  />
-                </div>
-                <p className="text-gray-400 text-sm mt-2 text-center">
-                  PROCOM event showcasing technical operations and assessment
-                  management
-                </p>
-              </div>
             </div>
           </div>
         </section>
