@@ -7,14 +7,19 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        'dark-purple': '#1e1b4b',
+        'deep-purple': '#2e1065',
+        'vibrant-purple': '#8b5cf6',
+      },
       keyframes: {
         'gradient-shift': {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
         },
         'pulse-glow': {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)' },
-          '50%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.8)' },
+          '0%, 100%': { boxShadow: '0 0 20px rgba(139, 92, 246, 0.5)' },
+          '50%': { boxShadow: '0 0 40px rgba(139, 92, 246, 0.8)' },
         },
         'float': {
           '0%, 100%': { transform: 'translateY(0px)' },

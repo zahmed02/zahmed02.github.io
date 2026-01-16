@@ -4,9 +4,10 @@
 
 @layer base {
   :root {
-    --primary-blue: #1e3a8a;
-    --primary-dark: #0f172a;
+    --primary-dark: #0a0a0a;
+    --primary-purple: #1e1b4b;
     --accent-cyan: #06b6d4;
+    --accent-purple: #8b5cf6;
   }
   
   body {
@@ -16,9 +17,13 @@
 
 @layer utilities {
   .bg-animated-gradient {
-    background: linear-gradient(-45deg, #0f172a, #1e1b4b, #1e3a8a, #1e40af);
+    background: linear-gradient(-45deg, #0a0a0a, #1e1b4b, #2e1065, #4c1d95);
     background-size: 400% 400%;
     animation: gradient-shift 15s ease infinite;
+  }
+  
+  .dark-card {
+    @apply bg-gray-900/40 backdrop-blur-sm border border-gray-800/50;
   }
   
   .scrollbar-hide {
@@ -31,11 +36,11 @@
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent;
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20;
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20;
   }
   
   .nav-link {
@@ -44,7 +49,7 @@
   
   .nav-link::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-500 transition-all duration-300;
   }
   
   .nav-link:hover::after {
@@ -52,9 +57,15 @@
   }
   
   .glow-border {
-    @apply border border-transparent;
+    @apply border border-transparent rounded-2xl;
     background: linear-gradient(var(--primary-dark), var(--primary-dark)) padding-box,
-                linear-gradient(45deg, var(--accent-cyan), #3b82f6) border-box;
+                linear-gradient(45deg, var(--accent-cyan), var(--accent-purple)) border-box;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 
+           text-white font-medium px-5 py-3 rounded-lg transition-all duration-300 
+           hover:scale-105 shadow-lg hover:shadow-cyan-500/30;
   }
 }
 
@@ -71,6 +82,11 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 .animate-blob {
   animation: blob 7s infinite;
 }
@@ -81,4 +97,8 @@
 
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
