@@ -178,7 +178,9 @@ export default function Page() {
 
               <div className="flex-1">
                 <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  Software Developer
+                  <span className="block text-gradient">
+                    Software Developer
+                  </span>
                 </h2>
                 <p className="text-gray-300 mb-6 text-lg leading-relaxed">
                   CS undergrad proficient in database management, system-level
