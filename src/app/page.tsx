@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   FaLinkedin,
   FaGithub,
@@ -11,24 +11,26 @@ import {
   FaEnvelope,
   FaPhone,
   FaMapMarkerAlt,
+  FaExternalLinkAlt,
   FaTimes,
-  FaExpand,
+  FaDownload,
 } from "react-icons/fa";
 import { SiCodesignal, SiSololearn, SiHackerrank } from "react-icons/si";
 import { TbWorld } from "react-icons/tb";
 import Image from "next/image";
 
 export default function Page() {
-  const [activeSection, setActiveSection] = useState("about");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("hero");
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
-  // Update active section on scroll
+  // Track scroll position for background and active nav
   useEffect(() => {
     const handleScroll = () => {
-      setScrollPosition(window.scrollY);
+      setScrollY(window.scrollY);
 
+      // Update active section based on scroll
       const sections = [
         "about",
         "education",
@@ -37,277 +39,293 @@ export default function Page() {
         "certifications",
         "contact",
       ];
-      const current = sections.find((section) => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top <= 100 && rect.bottom >= 100;
-        }
-        return false;
-      });
+      const currentSection =
+        sections.find((section) => {
+          const element = sectionRefs.current[section];
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            return rect.top <= 100 && rect.bottom >= 100;
+          }
+          return false;
+        }) || "hero";
 
-      if (current) setActiveSection(current);
+      setActiveSection(currentSection);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Dynamic background based on scroll
+  const getBackgroundStyle = () => {
+    const progress = Math.min(scrollY / 1000, 1);
+    const hue = Math.floor(210 + progress * 60); // 210 (blue) to 270 (purple)
+    return {
+      background: `linear-gradient(135deg, 
+        hsl(${hue}, 85%, 6%) 0%,
+        hsl(${hue + 10}, 75%, 10%) 25%,
+        hsl(${hue + 20}, 65%, 12%) 50%,
+        hsl(${hue}, 75%, 8%) 75%,
+        hsl(${hue - 10}, 85%, 6%) 100%
+      )`,
+    };
+  };
+
   // Smooth scroll to section
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      window.scrollTo({
-        top: element.offsetTop - 80,
-        behavior: "smooth",
-      });
-      setActiveSection(sectionId);
-      setIsMenuOpen(false);
+    if (sectionId === "hero") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setActiveSection("hero");
+    } else {
+      const element = sectionRefs.current[sectionId];
+      if (element) {
+        const offset = 80; // Account for fixed navbar
+        const elementPosition = element.offsetTop - offset;
+        window.scrollTo({ top: elementPosition, behavior: "smooth" });
+      }
     }
   };
 
-  const sections = [
-    { id: "about", label: "About", icon: <FaGraduationCap /> },
-    { id: "education", label: "Education", icon: <FaGraduationCap /> },
-    { id: "experience", label: "Experience", icon: <FaBriefcase /> },
-    { id: "skills", label: "Skills", icon: <FaCode /> },
-    { id: "certifications", label: "Certifications", icon: <FaCertificate /> },
-    { id: "contact", label: "Contact", icon: <FaEnvelope /> },
+  // Navigation items
+  const navItems = [
+    { id: "about", label: "About" },
+    { id: "education", label: "Education" },
+    { id: "experience", label: "Experience" },
+    { id: "skills", label: "Skills" },
+    { id: "certifications", label: "Certifications" },
+    { id: "contact", label: "Contact" },
   ];
 
+  // Open image in modal
+  const openImageModal = () => {
+    setIsImageModalOpen(true);
+    document.body.style.overflow = "hidden";
+  };
+
+  // Close image modal
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    document.body.style.overflow = "auto";
+  };
+
+  // Handle modal close on backdrop click
+  const handleModalClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      closeImageModal();
+    }
+  };
+
   return (
-    <div className="min-h-screen text-white">
-      {/* Animated Gradient Background */}
-      <div className="fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 animate-gradient-shift"></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-gray-900 via-blue-800 to-purple-800 animate-gradient-shift-reverse opacity-50"></div>
-
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-blue-500/20 animate-float"
-            style={{
-              width: `${Math.random() * 30 + 10}px`,
-              height: `${Math.random() * 30 + 10}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${Math.random() * 20 + 10}s`,
-            }}
-          />
-        ))}
-      </div>
-
+    <>
       {/* Fixed Navigation Bar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrollPosition > 100
-            ? "bg-gray-900/95 backdrop-blur-lg shadow-lg shadow-blue-900/20"
-            : "bg-transparent"
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+        style={{
+          background:
+            "linear-gradient(90deg, #000814 0%, #001d3d 50%, #000814 100%)",
+          backdropFilter: "blur(10px)",
+          boxShadow: "0 4px 30px rgba(0, 100, 255, 0.2)",
+        }}
       >
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600"></div>
-              <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Zubair Ahmed
-              </span>
-            </div>
-
-            {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-1">
-              {sections.map((section) => (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-8">
+              {navItems.map((item) => (
                 <button
-                  key={section.id}
-                  onClick={() => scrollToSection(section.id)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 ${
-                    activeSection === section.id
-                      ? "bg-gradient-to-r from-blue-800/80 to-cyan-800/80 text-white shadow-lg shadow-blue-500/20"
-                      : "text-gray-300 hover:text-white hover:bg-gray-800/50"
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+                    activeSection === item.id
+                      ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30"
+                      : "text-gray-300 hover:text-white hover:bg-blue-900/50"
                   }`}
                 >
-                  <span className="text-sm">{section.icon}</span>
-                  <span className="font-medium">{section.label}</span>
+                  {item.label}
                 </button>
               ))}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-gray-300 hover:text-white p-2 rounded-lg hover:bg-gray-800/50"
-            >
-              <div className="w-6 h-6 flex flex-col justify-center space-y-1">
-                <div
-                  className={`h-0.5 bg-current transition-all duration-300 ${
-                    isMenuOpen ? "w-6 rotate-45 translate-y-1.5" : "w-6"
-                  }`}
-                ></div>
-                <div
-                  className={`h-0.5 bg-current transition-all duration-300 ${
-                    isMenuOpen ? "opacity-0" : "w-6"
-                  }`}
-                ></div>
-                <div
-                  className={`h-0.5 bg-current transition-all duration-300 ${
-                    isMenuOpen ? "w-6 -rotate-45 -translate-y-1.5" : "w-6"
-                  }`}
-                ></div>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <div
-          className={`md:hidden overflow-hidden transition-all duration-300 ${
-            isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="px-4 pb-4 space-y-2 bg-gray-900/95 backdrop-blur-lg">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => scrollToSection(section.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-300 ${
-                  activeSection === section.id
-                    ? "bg-gradient-to-r from-blue-800 to-cyan-800 text-white"
-                    : "text-gray-300 hover:text-white hover:bg-gray-800/50"
-                }`}
+            <div className="flex items-center space-x-4">
+              <a
+                href="https://linkedin.com/in/zubair-ahmed-448041344"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-blue-400 transition-colors"
+                title="LinkedIn"
               >
-                <span>{section.icon}</span>
-                <span className="font-medium">{section.label}</span>
+                <FaLinkedin size={20} />
+              </a>
+              <a
+                href="https://github.com/zahmed02"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-white transition-colors"
+                title="GitHub"
+              >
+                <FaGithub size={20} />
+              </a>
+              <button
+                onClick={() => scrollToSection("contact")}
+                className="px-4 py-2 bg-gradient-to-r from-blue-700 to-cyan-600 text-white rounded-lg hover:from-blue-600 hover:to-cyan-500 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30"
+              >
+                Contact Me
               </button>
-            ))}
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="relative z-10 pt-20">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          {/* Hero Section */}
-          <section className="mb-16 flex flex-col md:flex-row items-center gap-8 animate-fade-in">
-            <div className="relative group">
-              <div
-                className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/30 cursor-pointer group-hover:shadow-cyan-500/50 group-hover:scale-105 transition-all duration-300"
-                onClick={() => setIsModalOpen(true)}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-800/20 z-10 group-hover:opacity-0 transition-opacity duration-300"></div>
-                <Image
-                  src="/procom-event.jpg"
-                  alt="Zubair Ahmed - Professional Photo"
-                  fill
-                  className="object-cover rounded-full group-hover:scale-110 transition-transform duration-500"
-                  priority
-                  sizes="(max-width: 768px) 12rem, 14rem"
-                />
+      <div
+        className="min-h-screen text-white pt-16 transition-all duration-500"
+        style={getBackgroundStyle()}
+      >
+        {/* Animated Background Particles */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-blue-400 rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                opacity: 0.3 + Math.random() * 0.3,
+              }}
+            />
+          ))}
+        </div>
 
-                {/* View Image Overlay */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 z-20 rounded-full">
-                  <div className="text-center p-4">
-                    <FaExpand className="text-3xl text-white mx-auto mb-2" />
-                    <p className="text-white font-medium">View Image</p>
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+          {/* Hero Section */}
+          <section className="mb-20 pt-8">
+            <div className="flex flex-col md:flex-row items-center gap-12">
+              {/* Image with hover effect */}
+              <div
+                className="relative group cursor-pointer"
+                onClick={openImageModal}
+              >
+                <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-cyan-400 shadow-2xl shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-500 group-hover:scale-105 group-hover:border-cyan-300">
+                  <Image
+                    src="/procom-event.jpg"
+                    alt="Zubair Ahmed - Professional Photo"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    priority
+                    sizes="(max-width: 768px) 16rem, 16rem"
+                  />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-blue-900/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="text-center p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                      <FaExternalLinkAlt className="inline-block mb-2 text-3xl text-white" />
+                      <p className="text-white font-semibold">Click to view</p>
+                    </div>
                   </div>
+                </div>
+
+                {/* Name under image */}
+                <div className="mt-8 text-center">
+                  <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent animate-gradient">
+                    Zubair Ahmed
+                  </h1>
+                  <div className="w-32 h-1 bg-gradient-to-r from-cyan-500 to-blue-500 mx-auto mt-4 rounded-full"></div>
                 </div>
               </div>
 
-              {/* Name under image */}
-              <div className="mt-4 text-center">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  Zubair Ahmed
+              {/* Hero Text */}
+              <div className="flex-1">
+                <h2 className="text-5xl md:text-6xl font-bold mb-6">
+                  <span className="block">Systems Software</span>
+                  <span className="block bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    Engineer & Developer
+                  </span>
                 </h2>
-                <p className="text-gray-300 text-sm mt-1">
-                  Systems Software Engineer
+                <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                  Passionate Computer Science undergraduate specializing in
+                  database management, system-level applications, and full-stack
+                  development. Focused on creating efficient, scalable solutions
+                  with expertise in both high and low-level programming.
                 </p>
-              </div>
-            </div>
 
-            <div className="flex-1 animate-slide-in-right">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Building Efficient &
-                <span className="block bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  Scalable Solutions
-                </span>
-              </h2>
-              <p className="text-gray-300 mb-6">
-                CS undergrad proficient in database management, system-level
-                applications, game engines, automation tools, &amp; simulators.
-                Skilled in high &amp; low-level programming. Focused on building
-                efficient, scalable low-level solutions.
-              </p>
-
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href="https://linkedin.com/in/zubair-ahmed-448041344"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-blue-700 hover:bg-blue-600 px-4 py-2 rounded-lg transition-all hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30"
-                >
-                  <FaLinkedin /> LinkedIn
-                </a>
-                <a
-                  href="https://github.com/zahmed02"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition-all hover:scale-105 hover:shadow-lg hover:shadow-gray-500/30"
-                >
-                  <FaGithub /> GitHub
-                </a>
-                <a
-                  href="mailto:zahmad2812@gmail.com"
-                  className="flex items-center gap-2 bg-cyan-700 hover:bg-cyan-600 px-4 py-2 rounded-lg transition-all hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30"
-                >
-                  <FaEnvelope /> Contact
-                </a>
+                <div className="flex flex-wrap gap-4">
+                  <a
+                    href="mailto:zahmad2812@gmail.com"
+                    className="flex items-center gap-3 bg-gradient-to-r from-cyan-700 to-blue-700 hover:from-cyan-600 hover:to-blue-600 px-6 py-3 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 group"
+                  >
+                    <FaEnvelope className="group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold">Get In Touch</span>
+                  </a>
+                  <a
+                    href="/resume.pdf"
+                    className="flex items-center gap-3 bg-gray-800/50 hover:bg-gray-700/50 px-6 py-3 rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-gray-500/20 border border-gray-700 group"
+                  >
+                    <FaDownload className="group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold">Download Resume</span>
+                  </a>
+                </div>
               </div>
             </div>
           </section>
 
           {/* About Section */}
-          <section id="about" className="mb-16 scroll-mt-20 animate-fade-in-up">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaGraduationCap className="text-cyan-400" />
-              About Me
-            </h2>
+          <section
+            id="about"
+            ref={(el) => (sectionRefs.current.about = el)}
+            className="mb-20 scroll-mt-16"
+          >
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
+                <FaGraduationCap className="text-white" />
+              </div>
+              <h2 className="text-4xl font-bold">About Me</h2>
+            </div>
+
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10">
-                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                  Background
+              <div className="bg-gradient-to-br from-gray-900/50 to-blue-900/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+                <h3 className="text-2xl font-semibold mb-4 text-cyan-300">
+                  Background & Vision
                 </h3>
-                <p className="text-gray-300">
+                <p className="text-gray-300 leading-relaxed">
                   Currently pursuing BS in Computer Science at FAST-NUCES
-                  Karachi. Passionate about systems programming, database
-                  management, and building efficient software solutions.
-                  Experienced in both high-level and low-level programming with
-                  a focus on performance optimization.
+                  Karachi with a focus on systems programming and database
+                  architecture. I combine theoretical knowledge with practical
+                  experience to build robust software solutions. My passion lies
+                  in optimizing performance and creating efficient low-level
+                  systems that scale.
                 </p>
               </div>
 
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800 hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
-                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                  Contact Info
+              <div className="bg-gradient-to-br from-gray-900/50 to-blue-900/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10">
+                <h3 className="text-2xl font-semibold mb-6 text-cyan-300">
+                  Contact Information
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 group">
-                    <FaPhone className="text-cyan-400 group-hover:scale-110 transition-transform" />
-                    <span className="group-hover:text-white transition-colors">
-                      +92-320-3060747
-                    </span>
+                <div className="space-y-5">
+                  <div className="flex items-center gap-4 group">
+                    <div className="w-10 h-10 rounded-lg bg-blue-900/50 flex items-center justify-center group-hover:bg-blue-800 transition-colors">
+                      <FaPhone className="text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">Phone</p>
+                      <p className="font-medium">+92-320-3060747</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 group">
-                    <FaEnvelope className="text-cyan-400 group-hover:scale-110 transition-transform" />
-                    <span className="group-hover:text-white transition-colors">
-                      zahmad2812@gmail.com
-                    </span>
+                  <div className="flex items-center gap-4 group">
+                    <div className="w-10 h-10 rounded-lg bg-blue-900/50 flex items-center justify-center group-hover:bg-blue-800 transition-colors">
+                      <FaEnvelope className="text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">Email</p>
+                      <p className="font-medium">zahmad2812@gmail.com</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 group">
-                    <FaMapMarkerAlt className="text-cyan-400 group-hover:scale-110 transition-transform" />
-                    <span className="group-hover:text-white transition-colors">
-                      Karachi, Sindh 75290
-                    </span>
+                  <div className="flex items-center gap-4 group">
+                    <div className="w-10 h-10 rounded-lg bg-blue-900/50 flex items-center justify-center group-hover:bg-blue-800 transition-colors">
+                      <FaMapMarkerAlt className="text-cyan-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-400">Location</p>
+                      <p className="font-medium">Karachi, Sindh 75290</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -315,112 +333,138 @@ export default function Page() {
           </section>
 
           {/* Education Section */}
-          <section id="education" className="mb-16 scroll-mt-20">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaGraduationCap className="text-cyan-400" />
-              Education
-            </h2>
+          <section
+            id="education"
+            ref={(el) => (sectionRefs.current.education = el)}
+            className="mb-20 scroll-mt-16"
+          >
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center">
+                <FaGraduationCap className="text-white" />
+              </div>
+              <h2 className="text-4xl font-bold">Education</h2>
+            </div>
+
             <div className="space-y-6">
               {[
                 {
                   title: "Bachelor of Science in Computer Science",
                   institution: "FAST-NUCES, Karachi",
                   period: "Sep 2023 – Jun 2027",
-                  color: "border-cyan-500",
-                  bg: "bg-cyan-900/20",
+                  color: "from-cyan-500 to-blue-600",
                 },
                 {
                   title: "IGCSE A Levels (Mathematics & CS)",
                   institution: "Cedar College, Karachi",
                   period: "Oct 2022 – Jun 2023",
-                  color: "border-blue-500",
-                  bg: "bg-blue-900/20",
+                  color: "from-blue-500 to-purple-600",
                 },
                 {
                   title: "IGCSE O Levels (General Studies)",
                   institution:
                     "Montessori Complex Cambridge School (MCCS), Karachi",
                   period: "May 2019 – Jun 2020 | Score: 2A*, 5A",
-                  color: "border-purple-500",
-                  bg: "bg-purple-900/20",
+                  color: "from-purple-500 to-pink-600",
                 },
               ].map((edu, index) => (
                 <div
                   key={index}
-                  className={`bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border-l-4 ${edu.color} hover:scale-[1.02] hover:shadow-lg transition-all duration-300 ${edu.bg}`}
+                  className="bg-gradient-to-br from-gray-900/50 to-blue-900/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50 hover:border-cyan-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 group"
                 >
-                  <h3 className="text-xl font-semibold">{edu.title}</h3>
-                  <p className="text-cyan-300">{edu.institution}</p>
-                  <p className="text-gray-400">{edu.period}</p>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-2xl font-semibold mb-2">
+                        {edu.title}
+                      </h3>
+                      <p className="text-cyan-300 text-lg">{edu.institution}</p>
+                    </div>
+                    <span
+                      className={`mt-2 md:mt-0 px-4 py-2 bg-gradient-to-r ${edu.color} text-white rounded-full text-sm font-medium`}
+                    >
+                      {edu.period}
+                    </span>
+                  </div>
+                  <div
+                    className={`h-1 w-24 rounded-full bg-gradient-to-r ${edu.color} transition-all duration-300 group-hover:w-32`}
+                  ></div>
                 </div>
               ))}
             </div>
           </section>
 
           {/* Experience Section */}
-          <section id="experience" className="mb-16 scroll-mt-20">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaBriefcase className="text-cyan-400" />
-              Experience
-            </h2>
-            <div className="space-y-6">
+          <section
+            id="experience"
+            ref={(el) => (sectionRefs.current.experience = el)}
+            className="mb-20 scroll-mt-16"
+          >
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-600 to-cyan-500 flex items-center justify-center">
+                <FaBriefcase className="text-white" />
+              </div>
+              <h2 className="text-4xl font-bold">Professional Experience</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
                   title: "Web Development Intern",
                   company: "HUM Network Ltd",
                   period: "June 2025 – July 2025",
-                  color: "bg-cyan-900",
-                  textColor: "text-cyan-300",
-                  items: [
-                    "Built responsive full-stack websites with interactive UIs, CRUD functionality",
-                    "Implemented relational database schemas and session-based authentication",
-                    "Designed RESTful APIs for data exchange across various systems",
+                  points: [
+                    "Built responsive full-stack websites with interactive UIs",
+                    "Implemented relational database schemas and authentication",
+                    "Designed RESTful APIs for data exchange",
                   ],
+                  color: "from-cyan-600 to-blue-700",
                 },
                 {
                   title: "Undergraduate Teaching Assistant",
                   company: "FAST-NUCES",
                   period: "Feb 2025 – May 2025",
-                  color: "bg-blue-900",
-                  textColor: "text-blue-300",
-                  items: [
-                    "Assisted in teaching MT-1008 Multivariate Calculus",
-                    "Assisted in teaching SS-1013 Ideology & Constitution of Pakistan",
+                  points: [
+                    "Assisted in teaching Multivariate Calculus",
+                    "Assisted in teaching Ideology & Constitution of Pakistan",
+                    "Provided mentorship to students",
                   ],
+                  color: "from-blue-600 to-purple-700",
                 },
                 {
-                  title: "Assessment Management & Technical Operations",
+                  title: "Technical Operations Manager",
                   company: "PROCOM & Developer's Day",
                   period: "Feb 2025 – Apr 2025",
-                  color: "bg-purple-900",
-                  textColor: "text-purple-300",
-                  items: [
-                    "Designed competitive programming problems and MCQs",
+                  points: [
+                    "Designed competitive programming problems",
                     "Managed technical logistics and server setup",
                     "Performed live troubleshooting during events",
                   ],
+                  color: "from-purple-600 to-pink-700",
                 },
               ].map((exp, index) => (
                 <div
                   key={index}
-                  className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 hover:scale-[1.01] hover:shadow-xl transition-all duration-300 border border-gray-800 hover:border-gray-700"
+                  className="bg-gradient-to-br from-gray-900/50 to-blue-900/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-cyan-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 group"
                 >
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-semibold">{exp.title}</h3>
-                      <p className="text-cyan-300">{exp.company}</p>
-                    </div>
-                    <span
-                      className={`${exp.color} ${exp.textColor} px-3 py-1 rounded-full text-sm mt-2 md:mt-0 inline-block w-fit`}
-                    >
+                  <div className="mb-4">
+                    <div
+                      className={`h-2 w-16 rounded-full bg-gradient-to-r ${exp.color} mb-4`}
+                    ></div>
+                    <h3 className="text-xl font-semibold mb-2">{exp.title}</h3>
+                    <p className="text-cyan-300">{exp.company}</p>
+                    <span className="inline-block mt-2 px-3 py-1 bg-gray-800/50 text-gray-300 rounded-full text-sm">
                       {exp.period}
                     </span>
                   </div>
-                  <ul className="space-y-2 text-gray-300">
-                    {exp.items.map((item, idx) => (
-                      <li key={idx} className="flex items-start">
-                        <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 mr-3 flex-shrink-0"></div>
-                        <span>{item}</span>
+                  <ul className="space-y-2">
+                    {exp.points.map((point, i) => (
+                      <li
+                        key={i}
+                        className="flex items-start gap-2 text-gray-300"
+                      >
+                        <span
+                          className={`w-2 h-2 mt-2 rounded-full bg-gradient-to-r ${exp.color}`}
+                        ></span>
+                        <span>{point}</span>
                       </li>
                     ))}
                   </ul>
@@ -430,16 +474,22 @@ export default function Page() {
           </section>
 
           {/* Skills Section */}
-          <section id="skills" className="mb-16 scroll-mt-20">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaCode className="text-cyan-400" />
-              Technical Skills
-            </h2>
+          <section
+            id="skills"
+            ref={(el) => (sectionRefs.current.skills = el)}
+            className="mb-20 scroll-mt-16"
+          >
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-orange-600 to-yellow-500 flex items-center justify-center">
+                <FaCode className="text-white" />
+              </div>
+              <h2 className="text-4xl font-bold">Technical Skills</h2>
+            </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
-                  title: "Languages",
+                  category: "Languages",
                   skills: [
                     "C/C++",
                     "C#",
@@ -451,15 +501,15 @@ export default function Page() {
                     "Assembly(x86)",
                     "Bash/Shell",
                   ],
-                  color: "bg-gray-700",
+                  color: "from-orange-500 to-red-500",
                 },
                 {
-                  title: "Databases",
+                  category: "Databases",
                   skills: ["SQL", "MongoDB", "PostgreSQL", "MySQL", "NoSQL"],
-                  color: "bg-blue-900/50",
+                  color: "from-blue-500 to-cyan-500",
                 },
                 {
-                  title: "Web Technologies",
+                  category: "Web Technologies",
                   skills: [
                     "HTML",
                     "CSS",
@@ -469,10 +519,10 @@ export default function Page() {
                     "PHP",
                     "jQuery",
                   ],
-                  color: "bg-purple-900/50",
+                  color: "from-green-500 to-emerald-500",
                 },
                 {
-                  title: "Data Science & ML",
+                  category: "Data Science & ML",
                   skills: [
                     "Pandas",
                     "NumPy",
@@ -482,10 +532,10 @@ export default function Page() {
                     "ggplot2",
                     "tidyr",
                   ],
-                  color: "bg-green-900/50",
+                  color: "from-purple-500 to-pink-500",
                 },
                 {
-                  title: "Infrastructure & Tools",
+                  category: "Infrastructure & Tools",
                   skills: [
                     "Ubuntu-Linux",
                     "Git",
@@ -493,10 +543,10 @@ export default function Page() {
                     "Irvine32",
                     "System Design",
                   ],
-                  color: "bg-yellow-900/50",
+                  color: "from-gray-500 to-blue-500",
                 },
                 {
-                  title: "Core Concepts",
+                  category: "Core Concepts",
                   skills: [
                     "OOP",
                     "Functional Programming",
@@ -506,21 +556,24 @@ export default function Page() {
                     "AI/ML",
                     "Cybersecurity",
                   ],
-                  color: "bg-red-900/50",
+                  color: "from-red-500 to-orange-500",
                 },
               ].map((category, index) => (
                 <div
                   key={index}
-                  className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800 hover:border-cyan-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/5"
+                  className="bg-gradient-to-br from-gray-900/50 to-blue-900/30 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-cyan-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10"
                 >
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                    {category.title}
+                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <span
+                      className={`w-3 h-3 rounded-full bg-gradient-to-r ${category.color}`}
+                    ></span>
+                    <span className="text-cyan-300">{category.category}</span>
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {category.skills.map((skill) => (
+                    {category.skills.map((skill, i) => (
                       <span
-                        key={skill}
-                        className={`${category.color} px-3 py-1 rounded-full text-sm hover:scale-105 hover:shadow-md transition-all duration-200 cursor-default`}
+                        key={i}
+                        className="px-3 py-2 bg-gray-800/50 text-gray-300 rounded-lg hover:bg-gray-700/70 hover:text-white transition-all duration-300 hover:scale-105 cursor-default"
                       >
                         {skill}
                       </span>
@@ -532,55 +585,69 @@ export default function Page() {
           </section>
 
           {/* Certifications Section */}
-          <section id="certifications" className="mb-16 scroll-mt-20">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaCertificate className="text-cyan-400" />
-              Certifications & Learning Platforms
-            </h2>
+          <section
+            id="certifications"
+            ref={(el) => (sectionRefs.current.certifications = el)}
+            className="mb-20 scroll-mt-16"
+          >
+            <div className="flex items-center gap-4 mb-10">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-600 to-rose-500 flex items-center justify-center">
+                <FaCertificate className="text-white" />
+              </div>
+              <h2 className="text-4xl font-bold">
+                Certifications & Learning Platforms
+              </h2>
+            </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
+                  name: "CodeSignal",
+                  icon: SiCodesignal,
+                  color: "text-orange-500",
+                  bgColor: "from-orange-900/30 to-orange-700/20",
                   href: "https://codesignal.com/learn/course-paths",
-                  icon: <SiCodesignal className="text-4xl text-orange-500" />,
-                  title: "CodeSignal",
                   desc: "Programming courses and certification paths",
-                  color: "hover:border-orange-500",
                 },
                 {
+                  name: "SoloLearn",
+                  icon: SiSololearn,
+                  color: "text-blue-500",
+                  bgColor: "from-blue-900/30 to-blue-700/20",
                   href: "https://www.sololearn.com/en/profile/27122128",
-                  icon: <SiSololearn className="text-4xl text-blue-500" />,
-                  title: "SoloLearn",
                   desc: "Interactive coding tutorials and certifications",
-                  color: "hover:border-blue-500",
                 },
                 {
+                  name: "Google Skillshop",
+                  icon: TbWorld,
+                  color: "text-green-500",
+                  bgColor: "from-green-900/30 to-green-700/20",
                   href: "https://skillshop.docebosaas.com/learn",
-                  icon: <TbWorld className="text-4xl text-green-500" />,
-                  title: "Google Skillshop",
                   desc: "Google's official certification platform",
-                  color: "hover:border-green-500",
                 },
                 {
+                  name: "LIFE Global",
+                  icon: TbWorld,
+                  color: "text-purple-500",
+                  bgColor: "from-purple-900/30 to-purple-700/20",
                   href: "https://www.life-global.org/",
-                  icon: <TbWorld className="text-4xl text-purple-500" />,
-                  title: "LIFE Global",
                   desc: "Leadership and professional development",
-                  color: "hover:border-purple-500",
                 },
                 {
+                  name: "HackerRank",
+                  icon: SiHackerrank,
+                  color: "text-emerald-500",
+                  bgColor: "from-emerald-900/30 to-emerald-700/20",
                   href: "https://www.hackerrank.com/dashboard",
-                  icon: <SiHackerrank className="text-4xl text-emerald-500" />,
-                  title: "HackerRank",
                   desc: "Coding challenges and skill assessments",
-                  color: "hover:border-emerald-500",
                 },
                 {
+                  name: "Cisco NetAcad",
+                  icon: TbWorld,
+                  color: "text-red-500",
+                  bgColor: "from-red-900/30 to-red-700/20",
                   href: "https://www.netacad.com/",
-                  icon: <TbWorld className="text-4xl text-red-500" />,
-                  title: "Cisco NetAcad",
                   desc: "Networking and IT certifications",
-                  color: "hover:border-red-500",
                 },
               ].map((platform, index) => (
                 <a
@@ -588,131 +655,196 @@ export default function Page() {
                   href={platform.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800 ${platform.color} transition-all hover:scale-[1.03] hover:shadow-xl group`}
+                  className={`block bg-gradient-to-br ${platform.bgColor} backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-xl hover:scale-[1.02] group`}
                 >
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="group-hover:scale-110 transition-transform duration-300">
-                      {platform.icon}
+                    <div className="p-3 rounded-xl bg-gray-800/50 group-hover:bg-gray-700/70 transition-colors">
+                      <platform.icon className={`text-3xl ${platform.color}`} />
                     </div>
-                    <h3 className="text-xl font-semibold group-hover:text-white transition-colors">
-                      {platform.title}
-                    </h3>
+                    <h3 className="text-xl font-semibold">{platform.name}</h3>
+                    <FaExternalLinkAlt className="ml-auto text-gray-400 group-hover:text-cyan-400 transition-colors" />
                   </div>
-                  <p className="text-gray-300 group-hover:text-gray-200 transition-colors">
-                    {platform.desc}
-                  </p>
+                  <p className="text-gray-300">{platform.desc}</p>
+                  <div className="mt-4 h-1 w-12 rounded-full bg-gradient-to-r from-gray-600 to-gray-400 group-hover:w-16 transition-all duration-300"></div>
                 </a>
               ))}
             </div>
           </section>
 
           {/* Contact Section */}
-          <section id="contact" className="mb-16 scroll-mt-20">
-            <h2 className="text-3xl font-bold mb-8">Get In Touch</h2>
+          <section
+            id="contact"
+            ref={(el) => (sectionRefs.current.contact = el)}
+            className="mb-20 scroll-mt-16"
+          >
+            <h2 className="text-4xl font-bold mb-12 text-center">
+              Get In Touch
+            </h2>
+
             <div className="grid md:grid-cols-3 gap-6">
               {[
                 {
-                  href: "mailto:zahmad2812@gmail.com",
-                  icon: <FaEnvelope className="text-4xl text-cyan-400" />,
+                  icon: FaEnvelope,
                   title: "Email",
-                  detail: "zahmad2812@gmail.com",
-                  color:
-                    "from-cyan-800/30 to-blue-800/30 hover:from-cyan-800/50 hover:to-blue-800/50",
+                  value: "zahmad2812@gmail.com",
+                  href: "mailto:zahmad2812@gmail.com",
+                  gradient: "from-cyan-700 to-blue-600",
                 },
                 {
-                  href: "https://linkedin.com/in/zubair-ahmed-448041344",
-                  icon: <FaLinkedin className="text-4xl text-blue-400" />,
+                  icon: FaLinkedin,
                   title: "LinkedIn",
-                  detail: "Connect professionally",
-                  color:
-                    "from-blue-800/30 to-sky-800/30 hover:from-blue-800/50 hover:to-sky-800/50",
+                  value: "Connect professionally",
+                  href: "https://linkedin.com/in/zubair-ahmed-448041344",
+                  gradient: "from-blue-700 to-sky-600",
                 },
                 {
-                  href: "https://github.com/zahmed02",
-                  icon: <FaGithub className="text-4xl text-white" />,
+                  icon: FaGithub,
                   title: "GitHub",
-                  detail: "View my projects",
-                  color:
-                    "from-gray-800/30 to-slate-800/30 hover:from-gray-800/50 hover:to-slate-800/50",
+                  value: "View my projects",
+                  href: "https://github.com/zahmed02",
+                  gradient: "from-gray-700 to-slate-600",
                 },
               ].map((contact, index) => (
                 <a
                   key={index}
                   href={contact.href}
-                  target={
-                    contact.href.startsWith("http") ? "_blank" : undefined
+                  target={contact.title !== "Email" ? "_blank" : undefined}
+                  rel={
+                    contact.title !== "Email"
+                      ? "noopener noreferrer"
+                      : undefined
                   }
-                  rel="noopener noreferrer"
-                  className={`bg-gradient-to-r ${contact.color} rounded-xl p-6 text-center transition-all hover:scale-105 hover:shadow-xl`}
+                  className={`block bg-gradient-to-br ${contact.gradient} rounded-2xl p-8 text-center hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 group`}
                 >
-                  <div className="mb-4 transform group-hover:scale-110 transition-transform">
-                    {contact.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">
+                  <contact.icon className="text-5xl mx-auto mb-6 text-white group-hover:scale-110 transition-transform" />
+                  <h3 className="text-2xl font-semibold mb-2">
                     {contact.title}
                   </h3>
-                  <p className="text-gray-300">{contact.detail}</p>
+                  <p className="text-gray-200">{contact.value}</p>
+                  <div className="mt-6 h-1 w-16 mx-auto rounded-full bg-white/30 group-hover:w-24 transition-all duration-300"></div>
                 </a>
               ))}
             </div>
           </section>
 
           {/* Footer */}
-          <footer className="mt-16 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p className="text-lg font-medium mb-2">
-              © {new Date().getFullYear()} Zubair Ahmed. All rights reserved.
-            </p>
-            <p className="text-gray-500 text-sm">
-              Built with Next.js & Tailwind CSS | Deployed on GitHub Pages
-            </p>
-            <div className="mt-6 flex justify-center space-x-6">
-              <a
-                href="https://github.com/zahmed02/zahmed02.github.io"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors hover:underline"
-              >
-                Source Code
-              </a>
-              <a
-                href="/resume.pdf"
-                className="text-gray-400 hover:text-white transition-colors hover:underline"
-              >
-                Download Resume
-              </a>
+          <footer className="mt-20 pt-12 border-t border-gray-700/50 text-center">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold mb-4">Zubair Ahmed</h3>
+              <p className="text-gray-400 mb-6">
+                Systems Software Engineer & Full-Stack Developer
+              </p>
+              <div className="flex justify-center space-x-6 mb-8">
+                {[
+                  {
+                    icon: FaLinkedin,
+                    href: "https://linkedin.com/in/zubair-ahmed-448041344",
+                    color: "hover:text-blue-400",
+                  },
+                  {
+                    icon: FaGithub,
+                    href: "https://github.com/zahmed02",
+                    color: "hover:text-white",
+                  },
+                  {
+                    icon: FaEnvelope,
+                    href: "mailto:zahmad2812@gmail.com",
+                    color: "hover:text-cyan-400",
+                  },
+                ].map((social, index) => (
+                  <a
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`text-gray-400 ${social.color} transition-colors p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/70`}
+                  >
+                    <social.icon size={20} />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-gray-500 text-sm">
+              <p>
+                © {new Date().getFullYear()} Zubair Ahmed. All rights reserved.
+              </p>
+              <p className="mt-2">
+                Built with Next.js & Tailwind CSS | Deployed on GitHub Pages
+              </p>
+              <div className="mt-4 flex justify-center space-x-6 text-gray-400">
+                <a
+                  href="https://github.com/zahmed02/zahmed02.github.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Source Code
+                </a>
+                <a
+                  href="/resume.pdf"
+                  className="hover:text-white transition-colors"
+                >
+                  Download Resume
+                </a>
+                <button
+                  onClick={() => scrollToSection("hero")}
+                  className="hover:text-white transition-colors"
+                >
+                  Back to Top
+                </button>
+              </div>
             </div>
           </footer>
         </div>
       </div>
 
       {/* Image Modal */}
-      {isModalOpen && (
+      {isImageModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-lg"
-          onClick={() => setIsModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          onClick={handleModalClick}
         >
-          <div className="relative max-w-4xl max-h-[90vh]">
+          <div className="relative max-w-4xl max-h-[90vh] mx-4">
             <button
-              className="absolute -top-12 right-0 text-white hover:text-cyan-400 transition-colors"
-              onClick={() => setIsModalOpen(false)}
+              onClick={closeImageModal}
+              className="absolute -top-12 right-0 text-white hover:text-cyan-400 transition-colors p-2"
             >
-              <FaTimes className="text-3xl" />
+              <FaTimes size={28} />
             </button>
-            <div className="relative w-full h-full rounded-lg overflow-hidden">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
               <Image
                 src="/procom-event.jpg"
-                alt="Zubair Ahmed - Full Size"
+                alt="Zubair Ahmed - Professional Photo"
                 width={3119}
                 height={4160}
-                className="object-contain max-h-[80vh] w-auto mx-auto"
+                className="w-full h-auto max-h-[90vh] object-contain"
               />
             </div>
             <p className="text-center text-gray-300 mt-4">
-              Zubair Ahmed - Professional Photo
+              Click outside to close
             </p>
           </div>
         </div>
       )}
-    </div>
+
+      {/* Add custom styles for gradient animation */}
+      <style jsx global>{`
+        @keyframes gradient {
+          0%,
+          100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 3s ease infinite;
+        }
+      `}</style>
+    </>
   );
 }
