@@ -237,7 +237,7 @@ export default function Page() {
                   <h3 className="text-xl font-semibold">
                     Assessment Management & Technical Operations
                   </h3>
-                  <p className="text-cyan-300">PROCOM & Developer's Day</p>
+                  <p className="text-cyan-300">PROCOM & Developer&apos;s Day</p>
                 </div>
                 <span className="bg-purple-900 text-purple-300 px-3 py-1 rounded-full text-sm">
                   Feb 2025 – Apr 2025
@@ -449,7 +449,7 @@ export default function Page() {
                 <h3 className="text-xl font-semibold">Google Skillshop</h3>
               </div>
               <p className="text-gray-300">
-                Google's official certification platform
+                Google&apos;s official certification platform
               </p>
             </a>
 
