@@ -1,3 +1,5 @@
+"use client";
+
 import {
   FaLinkedin,
   FaGithub,
@@ -50,11 +52,8 @@ export default function Page() {
 
         {/* Hero Section */}
         <section className="mb-16 flex flex-col md:flex-row items-center gap-8">
-          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/30">
-            {/* Replace with your actual image */}
-            <div className="w-full h-full bg-gradient-to-br from-cyan-600 to-blue-800 flex items-center justify-center">
-              <span className="text-4xl font-bold">ZA</span>
-            </div>
+          <div className="w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/30 flex items-center justify-center bg-gradient-to-br from-cyan-600 to-blue-800">
+            <span className="text-5xl font-bold text-white">ZA</span>
           </div>
 
           <div className="flex-1">
@@ -551,39 +550,12 @@ export default function Page() {
             >
               Source Code
             </a>
-            <a href="d:\Personal\ZA_Resume.pdf" className="hover:text-white">
+            <a href="/resume.pdf" className="hover:text-white">
               Download Resume
             </a>
           </div>
         </footer>
       </div>
-
-      {/* Add custom animations */}
-      <style jsx global>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   );
 }
