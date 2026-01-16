@@ -83,23 +83,13 @@ export default function Page() {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const downloadResume = () => {
-    // Create a temporary link element
-    const link = document.createElement("a");
-    link.href = "/resume.pdf";
-    link.download = "Zubair_Ahmed_Resume.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
-    <div className="min-h-screen bg-animated-gradient text-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950 text-white">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/4 w-60 h-60 bg-violet-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/4 w-60 h-60 bg-cyan-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Floating Particles */}
@@ -107,7 +97,7 @@ export default function Page() {
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-purple-400/30 rounded-full animate-float"
+            className="absolute w-1 h-1 bg-cyan-400/20 rounded-full animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -122,7 +112,7 @@ export default function Page() {
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-gray-900/90 backdrop-blur-md shadow-lg"
+            ? "bg-gradient-to-r from-black via-blue-950 to-black shadow-lg"
             : "bg-transparent"
         }`}
       >
@@ -132,10 +122,10 @@ export default function Page() {
               <button
                 key={item.id}
                 onClick={() => scrollToSection(item.id)}
-                className={`nav-link flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
                   activeSection === item.id
-                    ? "bg-gradient-to-r from-cyan-900/50 to-purple-900/50 text-cyan-300"
-                    : "text-gray-300 hover:bg-gray-800/50"
+                    ? "bg-gradient-to-r from-blue-800 to-cyan-800 text-white shadow-lg"
+                    : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
                 }`}
               >
                 <span className="hidden md:inline">{item.icon}</span>
@@ -147,16 +137,16 @@ export default function Page() {
       </nav>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 pt-24 pb-12">
-        {/* Hero Section - Now in a card */}
+        {/* Hero Section */}
         <section className="mb-20">
-          <div className="glow-border p-8 bg-gray-900/40 backdrop-blur-sm">
+          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
             <div className="flex flex-col md:flex-row items-center gap-8 animate-slide-in">
               <div
                 className="relative group cursor-pointer"
                 onClick={openModal}
               >
                 <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/50 animate-pulse-glow">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-purple-800/20 z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-800/20 z-10"></div>
                   <Image
                     src="/procom-event.jpg"
                     alt="Zubair Ahmed - Professional Photo"
@@ -182,7 +172,7 @@ export default function Page() {
                   <h1 className="text-4xl font-bold text-gradient">
                     Zubair Ahmed
                   </h1>
-                  <div className="mt-2 w-24 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 mx-auto rounded-full"></div>
+                  <div className="mt-2 w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full"></div>
                 </div>
               </div>
 
@@ -205,7 +195,7 @@ export default function Page() {
                     href="https://linkedin.com/in/zubair-ahmed-448041344"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 btn-primary"
+                    className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/30"
                   >
                     <FaLinkedin className="text-xl" /> LinkedIn
                   </a>
@@ -213,16 +203,17 @@ export default function Page() {
                     href="https://github.com/zahmed02"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gray-500/30"
+                    className="flex items-center gap-2 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gray-500/30"
                   >
                     <FaGithub className="text-xl" /> GitHub
                   </a>
-                  <button
-                    onClick={downloadResume}
-                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-purple-500/30"
+                  <a
+                    href="/ZA_Resume.pdf"
+                    download="Zubair_Ahmed_Resume.pdf"
+                    className="flex items-center gap-2 bg-gradient-to-r from-cyan-700 to-cyan-600 hover:from-cyan-600 hover:to-cyan-500 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/30"
                   >
                     <FaDownload className="text-xl" /> Download Resume
-                  </button>
+                  </a>
                 </div>
 
                 <div className="text-gray-400 text-sm">
@@ -238,13 +229,13 @@ export default function Page() {
 
         {/* About Section */}
         <section id="about" className="mb-20">
-          <div className="glow-border p-8 bg-gray-900/40 backdrop-blur-sm">
+          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
             <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
               <FaGraduationCap className="text-cyan-400" />
               About Me
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
-              <div className="dark-card rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 card-hover">
+              <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover">
                 <h3 className="text-xl font-semibold mb-4 text-cyan-300">
                   Background
                 </h3>
@@ -257,7 +248,7 @@ export default function Page() {
                 </p>
               </div>
 
-              <div className="dark-card rounded-xl p-6 hover:border-purple-500/50 transition-all duration-300 card-hover">
+              <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 card-hover">
                 <h3 className="text-xl font-semibold mb-4 text-cyan-300">
                   Contact Info
                 </h3>
@@ -282,7 +273,7 @@ export default function Page() {
 
         {/* Education Section */}
         <section id="education" className="mb-20">
-          <div className="glow-border p-8 bg-gray-900/40 backdrop-blur-sm">
+          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
             <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
               <FaGraduationCap className="text-cyan-400" />
               Education
@@ -293,25 +284,25 @@ export default function Page() {
                   title: "Bachelor of Science in Computer Science",
                   institution: "FAST-NUCES, Karachi",
                   period: "Sep 2023 – Jun 2027",
-                  borderColor: "border-cyan-500",
+                  color: "cyan",
                 },
                 {
                   title: "IGCSE A Levels (Mathematics & CS)",
                   institution: "Cedar College, Karachi",
                   period: "Oct 2022 – Jun 2023",
-                  borderColor: "border-blue-500",
+                  color: "blue",
                 },
                 {
                   title: "IGCSE O Levels (General Studies)",
                   institution:
                     "Montessori Complex Cambridge School (MCCS), Karachi",
                   period: "May 2019 – Jun 2020 | Score: 2A*, 5A",
-                  borderColor: "border-purple-500",
+                  color: "purple",
                 },
               ].map((edu, index) => (
                 <div
                   key={index}
-                  className={`dark-card rounded-xl p-6 border-l-4 ${edu.borderColor} transition-all duration-300 transform hover:-translate-y-1 card-hover`}
+                  className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-cyan-500 hover:border-cyan-400 transition-all duration-300 transform hover:-translate-y-1 card-hover"
                 >
                   <h3 className="text-xl font-semibold text-white">
                     {edu.title}
@@ -326,7 +317,7 @@ export default function Page() {
 
         {/* Experience Section */}
         <section id="experience" className="mb-20">
-          <div className="glow-border p-8 bg-gray-900/40 backdrop-blur-sm">
+          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
             <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
               <FaBriefcase className="text-cyan-400" />
               Experience
@@ -368,7 +359,7 @@ export default function Page() {
               ].map((exp, index) => (
                 <div
                   key={index}
-                  className="dark-card rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 card-hover"
+                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover"
                 >
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
                     <div>
@@ -400,7 +391,7 @@ export default function Page() {
 
         {/* Skills Section */}
         <section id="skills" className="mb-20">
-          <div className="glow-border p-8 bg-gray-900/40 backdrop-blur-sm">
+          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
             <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
               <FaCode className="text-cyan-400" />
               Technical Skills
@@ -421,12 +412,12 @@ export default function Page() {
                     "Assembly(x86)",
                     "Bash/Shell",
                   ],
-                  color: "from-gray-700/30 to-gray-800/30",
+                  color: "gray",
                 },
                 {
                   title: "Databases",
                   skills: ["SQL", "MongoDB", "PostgreSQL", "MySQL", "NoSQL"],
-                  color: "from-blue-900/30 to-cyan-900/30",
+                  color: "blue",
                 },
                 {
                   title: "Web Technologies",
@@ -439,7 +430,7 @@ export default function Page() {
                     "PHP",
                     "jQuery",
                   ],
-                  color: "from-purple-900/30 to-pink-900/30",
+                  color: "purple",
                 },
                 {
                   title: "Data Science & ML",
@@ -452,7 +443,7 @@ export default function Page() {
                     "ggplot2",
                     "tidyr",
                   ],
-                  color: "from-green-900/30 to-emerald-900/30",
+                  color: "green",
                 },
                 {
                   title: "Infrastructure & Tools",
@@ -463,7 +454,7 @@ export default function Page() {
                     "Irvine32",
                     "System Design",
                   ],
-                  color: "from-yellow-900/30 to-amber-900/30",
+                  color: "yellow",
                 },
                 {
                   title: "Core Concepts",
@@ -476,12 +467,12 @@ export default function Page() {
                     "AI/ML",
                     "Cybersecurity",
                   ],
-                  color: "from-red-900/30 to-rose-900/30",
+                  color: "red",
                 },
               ].map((category, index) => (
                 <div
                   key={index}
-                  className={`bg-gradient-to-br ${category.color} backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover group`}
+                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover group"
                 >
                   <h3 className="text-xl font-semibold mb-4 text-cyan-300 group-hover:text-cyan-400 transition-colors">
                     {category.title}
@@ -490,7 +481,7 @@ export default function Page() {
                     {category.skills.map((skill, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-800/50 hover:bg-gray-700/70 text-gray-300 hover:text-white transition-all duration-300 cursor-default hover:scale-105"
+                        className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-700/30 hover:bg-gray-600/50 text-gray-300 hover:text-white transition-all duration-300 cursor-default hover:scale-105"
                       >
                         {skill}
                       </span>
@@ -504,7 +495,7 @@ export default function Page() {
 
         {/* Certifications Section */}
         <section id="certifications" className="mb-20">
-          <div className="glow-border p-8 bg-gray-900/40 backdrop-blur-sm">
+          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
             <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
               <FaCertificate className="text-cyan-400" />
               Certifications & Learning Platforms
@@ -516,37 +507,37 @@ export default function Page() {
                   name: "CodeSignal",
                   url: "https://codesignal.com/learn/course-paths",
                   icon: <SiCodesignal />,
-                  color: "text-orange-500",
+                  color: "orange",
                 },
                 {
                   name: "SoloLearn",
                   url: "https://www.sololearn.com/en/profile/27122128",
                   icon: <SiSololearn />,
-                  color: "text-blue-500",
+                  color: "blue",
                 },
                 {
                   name: "Google Skillshop",
                   url: "https://skillshop.docebosaas.com/learn",
                   icon: <TbWorld />,
-                  color: "text-green-500",
+                  color: "green",
                 },
                 {
                   name: "LIFE Global",
                   url: "https://www.life-global.org/",
                   icon: <TbWorld />,
-                  color: "text-purple-500",
+                  color: "purple",
                 },
                 {
                   name: "HackerRank",
                   url: "https://www.hackerrank.com/dashboard",
                   icon: <SiHackerrank />,
-                  color: "text-emerald-500",
+                  color: "emerald",
                 },
                 {
                   name: "Cisco NetAcad",
                   url: "https://www.netacad.com/",
                   icon: <TbWorld />,
-                  color: "text-red-500",
+                  color: "red",
                 },
               ].map((platform, index) => (
                 <a
@@ -554,12 +545,10 @@ export default function Page() {
                   href={platform.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="dark-card rounded-xl p-6 hover:border-cyan-500 transition-all duration-300 card-hover group"
+                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500 transition-all duration-300 card-hover group"
                 >
                   <div className="flex items-center gap-4 mb-4">
-                    <div
-                      className={`text-4xl ${platform.color} group-hover:scale-110 transition-transform`}
-                    >
+                    <div className="text-4xl text-orange-500 group-hover:scale-110 transition-transform">
                       {platform.icon}
                     </div>
                     <h3 className="text-xl font-semibold text-white group-hover:text-cyan-300 transition-colors">
@@ -587,7 +576,7 @@ export default function Page() {
 
         {/* Contact Section */}
         <section id="contact" className="mb-20">
-          <div className="glow-border p-8 bg-gray-900/40 backdrop-blur-sm">
+          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
             <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
               <FaEnvelope className="text-cyan-400" />
               Get In Touch
@@ -599,21 +588,21 @@ export default function Page() {
                   type: "Email",
                   value: "zahmad2812@gmail.com",
                   icon: <FaEnvelope />,
-                  color: "from-cyan-800/20 to-cyan-900/20",
+                  color: "cyan",
                   href: "mailto:zahmad2812@gmail.com",
                 },
                 {
                   type: "LinkedIn",
                   value: "Connect professionally",
                   icon: <FaLinkedin />,
-                  color: "from-blue-800/20 to-sky-900/20",
+                  color: "blue",
                   href: "https://linkedin.com/in/zubair-ahmed-448041344",
                 },
                 {
                   type: "GitHub",
                   value: "View my projects",
                   icon: <FaGithub />,
-                  color: "from-gray-800/20 to-slate-900/20",
+                  color: "gray",
                   href: "https://github.com/zahmed02",
                 },
               ].map((contact, index) => (
@@ -622,7 +611,7 @@ export default function Page() {
                   href={contact.href}
                   target={contact.type !== "Email" ? "_blank" : undefined}
                   rel="noopener noreferrer"
-                  className={`bg-gradient-to-br ${contact.color} rounded-xl p-8 text-center hover:opacity-90 transition-all duration-300 card-hover group`}
+                  className="bg-gradient-to-br from-cyan-800/20 to-cyan-900/20 rounded-xl p-8 text-center hover:from-cyan-800/40 hover:to-cyan-900/40 transition-all duration-300 card-hover group"
                 >
                   <div className="text-5xl text-cyan-400 mb-6 mx-auto group-hover:scale-110 transition-transform">
                     {contact.icon}
@@ -639,7 +628,7 @@ export default function Page() {
 
             {/* Additional Contact Info */}
             <div className="mt-12 grid md:grid-cols-2 gap-8">
-              <div className="dark-card rounded-xl p-6">
+              <div className="bg-gray-800/30 rounded-xl p-6">
                 <h4 className="text-lg font-semibold mb-4 text-cyan-300">
                   Quick Contact
                 </h4>
@@ -653,7 +642,7 @@ export default function Page() {
                   </p>
                 </div>
               </div>
-              <div className="dark-card rounded-xl p-6">
+              <div className="bg-gray-800/30 rounded-xl p-6">
                 <h4 className="text-lg font-semibold mb-4 text-cyan-300">
                   Availability
                 </h4>
@@ -676,7 +665,7 @@ export default function Page() {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-gray-700/50 text-center text-gray-400">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full"></div>
+            <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"></div>
             <p className="text-lg">
               © {new Date().getFullYear()} Zubair Ahmed. All rights reserved.
             </p>
@@ -692,12 +681,13 @@ export default function Page() {
               >
                 Source Code
               </a>
-              <button
-                onClick={downloadResume}
+              <a
+                href="/ZA_Resume.pdf"
+                download="Zubair_Ahmed_Resume.pdf"
                 className="hover:text-cyan-300 transition-colors"
               >
                 Download Resume
-              </button>
+              </a>
               <button
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 className="hover:text-cyan-300 transition-colors"
@@ -709,42 +699,52 @@ export default function Page() {
         </footer>
       </div>
 
-      {/* Image Modal */}
+      {/* Image Modal - Full Screen View */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
           onClick={closeModal}
         >
           <div
-            className="relative max-w-5xl max-h-[90vh] w-full"
+            className="relative w-full h-full flex flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              className="absolute -top-12 right-0 text-white hover:text-cyan-300 text-4xl transition-colors z-50"
+              className="absolute top-4 right-4 md:top-8 md:right-8 text-white hover:text-cyan-300 text-3xl md:text-4xl transition-colors z-50 bg-black/50 rounded-full p-2"
             >
               <FaTimes />
             </button>
-            <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-cyan-500/50 shadow-2xl">
+
+            <div className="relative w-full h-full max-w-[90vw] max-h-[90vh] rounded-lg overflow-hidden">
               <Image
                 src="/procom-event.jpg"
                 alt="Zubair Ahmed - Professional Photo"
                 width={3119}
                 height={4160}
-                className="object-contain w-full h-full max-h-[70vh]"
+                className="object-contain w-full h-full"
                 priority
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-white">Zubair Ahmed</p>
-                  <p className="text-lg text-cyan-300">
-                    Systems Software Engineer & Full-Stack Developer
-                  </p>
-                  <p className="text-gray-400 mt-2">
-                    Click anywhere outside to close
-                  </p>
-                </div>
-              </div>
+            </div>
+
+            <div className="text-center mt-6 text-white">
+              <p className="text-2xl font-bold text-gradient">Zubair Ahmed</p>
+              <p className="text-lg text-gray-300 mt-2">
+                Systems Software Engineer & Full-Stack Developer
+              </p>
+              <button
+                onClick={() => {
+                  const link = document.createElement("a");
+                  link.href = "/procom-event.jpg";
+                  link.download = "Zubair_Ahmed_Professional_Photo.jpg";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                className="mt-4 px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-lg transition-all duration-300 flex items-center gap-2 mx-auto"
+              >
+                <FaDownload /> Download Photo
+              </button>
             </div>
           </div>
         </div>

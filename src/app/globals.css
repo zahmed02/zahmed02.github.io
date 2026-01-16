@@ -4,26 +4,38 @@
 
 @layer base {
   :root {
-    --primary-dark: #0a0a0a;
-    --primary-purple: #1e1b4b;
+    --primary-blue: #0c4a6e;
+    --primary-dark: #020617;
     --accent-cyan: #06b6d4;
-    --accent-purple: #8b5cf6;
   }
   
   body {
-    @apply antialiased;
+    @apply antialiased bg-gradient-to-br from-black via-gray-900 to-blue-950;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-900;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-cyan-600 to-blue-600 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gradient-to-b from-cyan-500 to-blue-500;
   }
 }
 
 @layer utilities {
   .bg-animated-gradient {
-    background: linear-gradient(-45deg, #0a0a0a, #1e1b4b, #2e1065, #4c1d95);
+    background: linear-gradient(-45deg, #000000, #0a0a0a, #0f172a, #1e3a8a);
     background-size: 400% 400%;
     animation: gradient-shift 15s ease infinite;
-  }
-  
-  .dark-card {
-    @apply bg-gray-900/40 backdrop-blur-sm border border-gray-800/50;
   }
   
   .scrollbar-hide {
@@ -36,36 +48,18 @@
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent;
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-purple-500/20;
-  }
-  
-  .nav-link {
-    @apply relative px-4 py-2 font-medium transition-all duration-300 hover:text-cyan-300;
-  }
-  
-  .nav-link::after {
-    content: '';
-    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-purple-500 transition-all duration-300;
-  }
-  
-  .nav-link:hover::after {
-    @apply w-full;
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20;
   }
   
   .glow-border {
-    @apply border border-transparent rounded-2xl;
+    @apply border border-transparent;
     background: linear-gradient(var(--primary-dark), var(--primary-dark)) padding-box,
-                linear-gradient(45deg, var(--accent-cyan), var(--accent-purple)) border-box;
-  }
-  
-  .btn-primary {
-    @apply bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 
-           text-white font-medium px-5 py-3 rounded-lg transition-all duration-300 
-           hover:scale-105 shadow-lg hover:shadow-cyan-500/30;
+                linear-gradient(45deg, var(--accent-cyan), #3b82f6, #8b5cf6) border-box;
+    border-radius: 1rem;
   }
 }
 
@@ -82,9 +76,19 @@
   100% { background-position: 0% 50%; }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes slide-in {
+  0% { transform: translateX(-100%); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
 }
 
 .animate-blob {
@@ -99,6 +103,14 @@
   animation-delay: 4s;
 }
 
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.8s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
 }
