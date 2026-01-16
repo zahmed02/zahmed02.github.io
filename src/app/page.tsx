@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import { SiCodesignal, SiSololearn, SiHackerrank } from "react-icons/si";
 import { TbWorld } from "react-icons/tb";
+import Image from "next/image";
 
 export default function Page() {
   return (
@@ -65,8 +66,8 @@ export default function Page() {
             </h2>
             <p className="text-gray-300 mb-6">
               CS undergrad proficient in database management, system-level
-              applications, game engines, automation tools, & simulators.
-              Skilled in high & low-level programming. Focused on building
+              applications, game engines, automation tools, &amp; simulators.
+              Skilled in high &amp; low-level programming. Focused on building
               efficient, scalable low-level solutions.
             </p>
 
@@ -156,7 +157,7 @@ export default function Page() {
 
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-blue-500">
               <h3 className="text-xl font-semibold">
-                IGCSE A Levels (Mathematics & CS)
+                IGCSE A Levels (Mathematics &amp; CS)
               </h3>
               <p className="text-cyan-300">Cedar College, Karachi</p>
               <p className="text-gray-400">Oct 2022 – Jun 2023</p>
@@ -225,7 +226,7 @@ export default function Page() {
               <ul className="list-disc list-inside space-y-2 text-gray-300 ml-4">
                 <li>Assisted in teaching MT-1008 Multivariate Calculus</li>
                 <li>
-                  Assisted in teaching SS-1013 Ideology & Constitution of
+                  Assisted in teaching SS-1013 Ideology &amp; Constitution of
                   Pakistan
                 </li>
               </ul>
@@ -235,9 +236,11 @@ export default function Page() {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-xl font-semibold">
-                    Assessment Management & Technical Operations
+                    Assessment Management &amp; Technical Operations
                   </h3>
-                  <p className="text-cyan-300">PROCOM & Developer&apos;s Day</p>
+                  <p className="text-cyan-300">
+                    PROCOM &amp; Developer&apos;s Day
+                  </p>
                 </div>
                 <span className="bg-purple-900 text-purple-300 px-3 py-1 rounded-full text-sm">
                   Feb 2025 – Apr 2025
@@ -248,6 +251,27 @@ export default function Page() {
                 <li>Managed technical logistics and server setup</li>
                 <li>Performed live troubleshooting during events</li>
               </ul>
+
+              {/* PROCOM Event Image */}
+              <div className="mt-6 pt-6 border-t border-gray-700">
+                <h4 className="text-lg font-semibold mb-4 text-cyan-300">
+                  Event Photo
+                </h4>
+                <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-600 shadow-lg">
+                  <Image
+                    src="/procom-event.jpg"
+                    alt="PROCOM Event - Technical Operations Team"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    priority={false}
+                  />
+                </div>
+                <p className="text-gray-400 text-sm mt-2 text-center">
+                  PROCOM event showcasing technical operations and assessment
+                  management
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -330,7 +354,7 @@ export default function Page() {
 
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6">
               <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                Data Science & ML
+                Data Science &amp; ML
               </h3>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -354,7 +378,7 @@ export default function Page() {
 
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6">
               <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                Infrastructure & Tools
+                Infrastructure &amp; Tools
               </h3>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -404,7 +428,7 @@ export default function Page() {
         <section id="certifications" className="mb-16">
           <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
             <FaCertificate className="text-cyan-400" />
-            Certifications & Learning Platforms
+            Certifications &amp; Learning Platforms
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -539,7 +563,7 @@ export default function Page() {
         <footer className="mt-16 pt-8 border-t border-gray-700 text-center text-gray-400">
           <p>© {new Date().getFullYear()} Zubair Ahmed. All rights reserved.</p>
           <p className="mt-2">
-            Built with Next.js & Tailwind CSS | Deployed on GitHub Pages
+            Built with Next.js &amp; Tailwind CSS | Deployed on GitHub Pages
           </p>
           <div className="mt-4 flex justify-center space-x-6">
             <a
