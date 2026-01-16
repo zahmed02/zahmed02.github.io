@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FaLinkedin,
   FaGithub,
@@ -14,7 +14,6 @@ import {
   FaDownload,
   FaExpand,
   FaTimes,
-  FaChevronDown,
 } from "react-icons/fa";
 import { SiCodesignal, SiSololearn, SiHackerrank } from "react-icons/si";
 import { TbWorld } from "react-icons/tb";
@@ -25,14 +24,21 @@ export default function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const navItems = [
-    { id: "about", label: "About", icon: <FaGraduationCap /> },
-    { id: "education", label: "Education", icon: <FaGraduationCap /> },
-    { id: "experience", label: "Experience", icon: <FaBriefcase /> },
-    { id: "skills", label: "Skills", icon: <FaCode /> },
-    { id: "certifications", label: "Certifications", icon: <FaCertificate /> },
-    { id: "contact", label: "Contact", icon: <FaEnvelope /> },
-  ];
+  const navItems = useMemo(
+    () => [
+      { id: "about", label: "About", icon: <FaGraduationCap /> },
+      { id: "education", label: "Education", icon: <FaGraduationCap /> },
+      { id: "experience", label: "Experience", icon: <FaBriefcase /> },
+      { id: "skills", label: "Skills", icon: <FaCode /> },
+      {
+        id: "certifications",
+        label: "Certifications",
+        icon: <FaCertificate />,
+      },
+      { id: "contact", label: "Contact", icon: <FaEnvelope /> },
+    ],
+    []
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,7 +62,7 @@ export default function Page() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [navItems]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -282,7 +288,7 @@ export default function Page() {
               ].map((edu, index) => (
                 <div
                   key={index}
-                  className={`bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-${edu.color}-500 hover:border-${edu.color}-400 transition-all duration-300 transform hover:-translate-y-1 card-hover`}
+                  className={`bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-cyan-500 hover:border-cyan-400 transition-all duration-300 transform hover:-translate-y-1 card-hover`}
                 >
                   <h3 className="text-xl font-semibold text-white">
                     {edu.title}
@@ -348,9 +354,7 @@ export default function Page() {
                       </h3>
                       <p className="text-cyan-300">{exp.company}</p>
                     </div>
-                    <span
-                      className={`bg-${exp.color}-900/50 text-${exp.color}-300 px-4 py-2 rounded-full text-sm font-medium`}
-                    >
+                    <span className="bg-cyan-900/50 text-cyan-300 px-4 py-2 rounded-full text-sm font-medium">
                       {exp.period}
                     </span>
                   </div>
@@ -463,7 +467,7 @@ export default function Page() {
                     {category.skills.map((skill, idx) => (
                       <span
                         key={idx}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium bg-${category.color}-900/30 hover:bg-${category.color}-800/50 text-${category.color}-300 hover:text-white transition-all duration-300 cursor-default hover:scale-105`}
+                        className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-700/30 hover:bg-gray-600/50 text-gray-300 hover:text-white transition-all duration-300 cursor-default hover:scale-105"
                       >
                         {skill}
                       </span>
@@ -527,12 +531,10 @@ export default function Page() {
                   href={platform.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-${platform.color}-500 transition-all duration-300 card-hover group`}
+                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500 transition-all duration-300 card-hover group"
                 >
                   <div className="flex items-center gap-4 mb-4">
-                    <div
-                      className={`text-4xl text-${platform.color}-500 group-hover:scale-110 transition-transform`}
-                    >
+                    <div className="text-4xl text-orange-500 group-hover:scale-110 transition-transform">
                       {platform.icon}
                     </div>
                     <h3 className="text-xl font-semibold text-white group-hover:text-cyan-300 transition-colors">
@@ -595,11 +597,9 @@ export default function Page() {
                   href={contact.href}
                   target={contact.type !== "Email" ? "_blank" : undefined}
                   rel="noopener noreferrer"
-                  className={`bg-gradient-to-br from-${contact.color}-800/20 to-${contact.color}-900/20 rounded-xl p-8 text-center hover:from-${contact.color}-800/40 hover:to-${contact.color}-900/40 transition-all duration-300 card-hover group`}
+                  className="bg-gradient-to-br from-cyan-800/20 to-cyan-900/20 rounded-xl p-8 text-center hover:from-cyan-800/40 hover:to-cyan-900/40 transition-all duration-300 card-hover group"
                 >
-                  <div
-                    className={`text-5xl text-${contact.color}-400 mb-6 mx-auto group-hover:scale-110 transition-transform`}
-                  >
+                  <div className="text-5xl text-cyan-400 mb-6 mx-auto group-hover:scale-110 transition-transform">
                     {contact.icon}
                   </div>
                   <h3 className="text-xl font-semibold mb-2 text-white">
