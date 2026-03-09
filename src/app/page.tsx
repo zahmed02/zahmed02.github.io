@@ -22,7 +22,6 @@ import Image from "next/image";
 export default function Page() {
   const [activeSection, setActiveSection] = useState("about");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [particles, setParticles] = useState<
     { left: string; top: string; animationDelay: string; animationDuration: string }[]
   >([]);
@@ -45,8 +44,6 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-
       // Update active section based on scroll
       const sections = navItems.map((item) => item.id);
       const current = sections.find((section) => {
@@ -119,11 +116,7 @@ export default function Page() {
 
       {/* Fixed Navigation Bar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-gradient-to-r from-black via-blue-950 to-black shadow-lg"
-            : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur transition-all duration-300`}
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex justify-center items-center space-x-1 md:space-x-4 flex-wrap">
