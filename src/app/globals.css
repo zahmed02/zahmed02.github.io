@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   :root {
@@ -10,7 +8,7 @@
   }
   
   body {
-    @apply antialiased bg-gradient-to-br from-black via-gray-900 to-blue-950;
+    @apply antialiased bg-linear-to-br from-black via-gray-900 to-blue-950;
   }
   
   /* Custom scrollbar */
@@ -23,11 +21,11 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-cyan-600 to-blue-600 rounded-full;
+    @apply bg-linear-to-b from-cyan-600 to-blue-600 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gradient-to-b from-cyan-500 to-blue-500;
+    @apply bg-linear-to-b from-cyan-500 to-blue-500;
   }
 }
 
@@ -48,7 +46,7 @@
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent;
   }
   
   .card-hover {
