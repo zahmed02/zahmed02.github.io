@@ -22,7 +22,9 @@ import Image from "next/image";
 export default function Page() {
   const [activeSection, setActiveSection] = useState("about");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [particles, setParticles] = useState<
+    { left: string; top: string; animationDelay: string; animationDuration: string }[]
+  >([]);
 
   const navItems = useMemo(
     () => [
@@ -42,8 +44,6 @@ export default function Page() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-
       // Update active section based on scroll
       const sections = navItems.map((item) => item.id);
       const current = sections.find((section) => {
@@ -80,6 +80,17 @@ export default function Page() {
     }
   };
 
+  useEffect(() => {
+    setParticles(
+      [...Array(20)].map(() => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${3 + Math.random() * 4}s`,
+      }))
+    );
+  }, []);
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
@@ -94,27 +105,18 @@ export default function Page() {
 
       {/* Floating Particles */}
       <div className="fixed inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {particles.map((style, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-cyan-400/20 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
-            }}
+            style={style}
           />
         ))}
       </div>
 
       {/* Fixed Navigation Bar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-gradient-to-r from-black via-blue-950 to-black shadow-lg"
-            : "bg-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur transition-all duration-300`}
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex justify-center items-center space-x-1 md:space-x-4 flex-wrap">
