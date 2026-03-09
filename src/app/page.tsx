@@ -23,6 +23,9 @@ export default function Page() {
   const [activeSection, setActiveSection] = useState("about");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [particles, setParticles] = useState<
+    { left: string; top: string; animationDelay: string; animationDuration: string }[]
+  >([]);
 
   const navItems = useMemo(
     () => [
@@ -80,6 +83,17 @@ export default function Page() {
     }
   };
 
+  useEffect(() => {
+    setParticles(
+      [...Array(20)].map(() => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 5}s`,
+        animationDuration: `${3 + Math.random() * 4}s`,
+      }))
+    );
+  }, []);
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
@@ -94,16 +108,11 @@ export default function Page() {
 
       {/* Floating Particles */}
       <div className="fixed inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {particles.map((style, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 bg-cyan-400/20 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`,
-            }}
+            style={style}
           />
         ))}
       </div>
