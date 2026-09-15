@@ -1,755 +1,97 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import {
-  FaLinkedin,
-  FaGithub,
-  FaGraduationCap,
-  FaBriefcase,
-  FaCertificate,
-  FaCode,
-  FaEnvelope,
-  FaPhone,
-  FaMapMarkerAlt,
-  FaDownload,
-  FaExpand,
-  FaTimes,
-} from "react-icons/fa";
-import { SiCodesignal, SiSololearn, SiHackerrank } from "react-icons/si";
-import { TbWorld } from "react-icons/tb";
-import Image from "next/image";
+  ArrowDown, ArrowUpRight, Award, BookOpen, BriefcaseBusiness, Code2,
+  ExternalLink, GraduationCap, HeartHandshake, Mail,
+  MapPin, Menu, Phone, School, Share2, Terminal, Trophy, Users, X
+} from "lucide-react";
+import { getSupabase } from "../lib/supabase-browser";
+
+const profileImage = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2025-02-18%20Event%20PROCOM-dylV9Y2yzk6qyhQM8C0AjaASoyW6kE.jpeg";
+
+const backgroundImages = [
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dynamic-motion-blur-stockcake-OiVKyJP3UzNorIS3d9Ol374R5k2kDF.jpg",
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dynamic-motion-blur-stockcake%20%281%29-ivWPtr741o2DYI9cIMwrBhJ4cswUFA.jpg",
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/images.jfif-cFzfvfo388CXASsVyg5wSrHrIsJbTS.jpeg",
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a-dynamic-swirl-of-black-and-white-fluid-captures-motion-and-contrast-in-an-artistic-arrangement-on-a-bright-background-photo-JzAZU6tgXbsHjVdySjSe3Dm84m2CIR.jpg",
+];
+
+const experience = [
+  ["Jul 2026 to Aug 2026", "Artificial Intelligence Intern", "Patel Hospital", "Created a pneumonia detection model using CNN and ViT with Grad CAM and RAG based clinical querying. Built a LangGraph agent for patient triage, bed and equipment allocation, discharge prediction and a multilingual Groq LLM assistant."],
+  ["Jan 2026 to Mar 2026", "Software Developer", "SHAHFAY", "Contributed across the full software development lifecycle, from system design and database architecture through deployment, testing and quality assurance."],
+  ["Jun 2025 to Jul 2025", "Full Stack Development Intern", "HUM Network Ltd", "Built responsive full stack websites with interactive interfaces, CRUD functionality, relational schemas, session based access control and RESTful APIs."],
+  ["Feb 2025 to Present", "Undergraduate Teaching Assistant", "FAST NUCES", "Teaching, mentoring and grading for MT 1008 Multivariate Calculus and SS 1013 Ideology and Constitution of Pakistan."],
+];
+
+const volunteering = [
+  ["Oct 2025 to Feb 2026", "Co Head, Computer Science Competitions", "PROCOM", "Competition delivery, problem design, technical logistics and live operations."],
+  ["Apr 2025", "Assessment Management, Computer Science and General Competitions", "Developers Day, ACM NUCES", "Assessment and general management for a science and technology event."],
+  ["Mar 2025", "Outreach Volunteer and Public Engagement", "Alkhidmat Karachi", "Public engagement and outreach support."],
+  ["Mar 2025", "Community Service Volunteer, Class Visit Coordinator", "Dar ul Sukun", "Community service and class visit coordination."],
+  ["Jun 2023 to Jul 2023", "Youth Support Volunteer", "Dar ul Sukun", "Child welfare and program coordination."],
+];
+
+const projects = [
+  ["AL2002", "Contextual Multi Arm Recommendation System", "May 2026", "Python, AI and ML, Reinforcement Learning, Scikit Learn, Flask", "Built an AI driven shopping decision engine with A star search and contextual bandits. LinUCB recommendations and a Random Forest model achieved 0.9967 ROC AUC and 0.951 recall."],
+  ["CS3009", "Backend Performance Optimization", "Apr 2026", "C sharp, ASP.NET Core 8, Oracle 21c XE, Next.js", "Demonstrated indexing, query optimization, optimistic concurrency and asynchronous execution. Integrated Oracle with Entity Framework Core, a five layer architecture, API testing and unit testing."],
+  ["CS4031", "Graphics DSL Compiler Targeting x86 Assembly", "Apr 2026", "Rust, Lexer, Recursive Descent Parser, x86 Assembly, MASM", "Built an end to end compiler with lexing, parsing, semantic analysis, symbol tables, three address code, constant folding and machine code generation for executable console graphics."],
+  ["CS3001", "Microservices Network Manager", "Dec 2025", "Python, FastAPI, WebSockets, REST APIs, gRPC", "Built a FastAPI gateway with round robin load balancing, health monitoring and subprocess lifecycle management. Added WebSocket ChatOps, role based access and failure recovery."],
+];
+
+const skillGroups = [
+  ["Languages", "JavaScript and TypeScript, C and C++, C sharp, Python, Java, Bash and Shell, Assembly x86, Rust"],
+  ["Frameworks", "Next.js, React.js, TailwindCSS, ASP.NET Core, FastAPI, Node.js, Express.js"],
+  ["Data and AI", "MongoDB, PostgreSQL, MySQL, Pandas, NumPy, Scikit Learn, LangChain, LangGraph, PyTorch"],
+  ["Engineering", "RESTful APIs, Full Stack and MERN, Object Oriented Programming, Algorithm Design, Testing, Linux, Git, Docker, AWS"],
+];
+
+const awards = [
+  ["Star Performer Award", "PROCOM 25, Management and Leadership"],
+  ["Star Performer Award", "Developers Day 25, Assessment and General Management"],
+  ["Achievement Award", "Integration Bee 2023, Mathematics Competition"],
+  ["Dedication Award", "Scratch Programming 2023, Computer Science Competition"],
+  ["Merit Certificate", "Exploring Shadow Phenomena, 2016"],
+];
+
+function MotionBackdrop() {
+  const [active, setActive] = useState(0);
+  useEffect(() => { const timer = window.setInterval(() => setActive((value) => (value + 1) % backgroundImages.length), 10000); return () => window.clearInterval(timer); }, []);
+  return <div className="motion-backdrop" aria-hidden="true"><AnimatePresence mode="sync"><motion.div key={active} className="backdrop-image" style={{ backgroundImage: `url(${backgroundImages[active]})` }} initial={{ opacity: 0, scale: 1.08 }} animate={{ opacity: 0.16, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 3.2, ease: "easeInOut" }} /></AnimatePresence><div className="backdrop-wash" /></div>;
+}
+
+function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <motion.div className={className} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-70px" }} transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>{children}</motion.div>;
+}
+
+function Label({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) { return <div className="label"><Icon size={15} /><span>{children}</span></div>; }
 
 export default function Page() {
-  const [activeSection, setActiveSection] = useState("about");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [particles, setParticles] = useState<
-    { left: string; top: string; animationDelay: string; animationDuration: string }[]
-  >([]);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [visits, setVisits] = useState<number | null>(null);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 100, damping: 26 });
+  useEffect(() => { const record = async () => { try { const supabase = getSupabase(); if (!supabase) return; const { data } = await supabase.rpc("increment_site_visits"); if (typeof data === "number") setVisits(data); } catch { setVisits(null); } }; record(); }, []);
+  const close = () => setMenuOpen(false);
+  return <main>
+    <MotionBackdrop /><motion.div className="progress" style={{ scaleX: progress }} />
+    <header className="header"><a className="brand" href="#home" onClick={close}><span>ZA</span><strong>Zubair Ahmed</strong></a><nav className={menuOpen ? "open" : ""}>{["About", "Experience", "Projects", "Education", "Contact"].map((item) => <a key={item} href={`#${item.toLowerCase()}`} onClick={close}>{item}</a>)}</nav><a className="header-contact" href="mailto:zahmad2812@gmail.com"><Mail size={15} /> Contact</a><button className="menu" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle navigation">{menuOpen ? <X /> : <Menu />}</button></header>
 
-  const navItems = useMemo(
-    () => [
-      { id: "about", label: "About", icon: <FaGraduationCap /> },
-      { id: "education", label: "Education", icon: <FaGraduationCap /> },
-      { id: "experience", label: "Experience", icon: <FaBriefcase /> },
-      { id: "skills", label: "Skills", icon: <FaCode /> },
-      {
-        id: "certifications",
-        label: "Certifications",
-        icon: <FaCertificate />,
-      },
-      { id: "contact", label: "Contact", icon: <FaEnvelope /> },
-    ],
-    []
-  );
+    <section id="home" className="hero shell"><div className="hero-content"><Reveal><p className="kicker"><span className="pulse" /> Computer Science and Applied AI</p></Reveal><Reveal><h1>Engineering ideas<br /><i>into useful systems.</i></h1></Reveal><Reveal><p className="lede">Computer Science student at FAST NUCES with experience in software development, systems engineering and applied AI. Passionate about building scalable applications and exploring emerging technologies.</p></Reveal><Reveal className="hero-actions"><a className="primary" href="#projects">View selected work <ArrowDown size={16} /></a><a className="underlined" href="/ZA_Resume.pdf" target="_blank" rel="noreferrer">Resume <ExternalLink size={15} /></a></Reveal></div><div className="identity-card"><div className="portrait-frame"><img src={profileImage} alt="Zubair Ahmed at PROCOM 25" /><span className="portrait-mark">ZA</span></div><div><strong>Karachi, Sindh</strong><span>Available for meaningful work</span></div></div></section>
 
-  useEffect(() => {
-    const handleScroll = () => {
-      // Update active section based on scroll
-      const sections = navItems.map((item) => item.id);
-      const current = sections.find((section) => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top <= 100 && rect.bottom >= 100;
-        }
-        return false;
-      });
+    <section id="about" className="block about"><div className="shell"><Label icon={Users}>Profile</Label><div className="two-col"><div><h2>Curious by nature.<br /><i>Precise by practice.</i></h2></div><div className="profile-copy"><p>Computer Science student with experience in software development, systems engineering and applied AI. Passionate about building scalable applications and exploring emerging technologies, seeking roles that blend engineering with research.</p><div className="facts"><span><MapPin size={16} /> Karachi, Sindh</span><span><GraduationCap size={16} /> FAST NUCES, 2023 to 2027</span><span><Terminal size={16} /> Software and AI</span><span><Users size={16} /> Teaching and mentoring</span></div></div></div></div></section>
 
-      if (current) {
-        setActiveSection(current);
-      }
-    };
+    <section id="experience" className="block experience"><div className="shell"><Label icon={BriefcaseBusiness}>Professional experience</Label><div className="section-head"><h2>Selected roles</h2><p>Professional work listed in my resume.</p></div><div className="rows">{experience.map(([period, role, company, detail]) => <Reveal className="role" key={role}><time>{period}</time><div><h3>{role}</h3><strong>{company}</strong><p>{detail}</p></div></Reveal>)}</div></div></section>
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [navItems]);
+    <section id="volunteering" className="block volunteering"><div className="shell"><Label icon={HeartHandshake}>Volunteering and leadership</Label><div className="section-head"><h2>Service and community</h2><p>Leadership and public engagement from my resume.</p></div><div className="volunteer-list">{volunteering.map(([period, role, company, detail], index) => <Reveal className="volunteer" key={`${role}${index}`}><span className="number">0{index + 1}</span><div><time>{period}</time><h3>{role}</h3><strong>{company}</strong><p>{detail}</p></div></Reveal>)}</div></div></section>
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
+    <section id="projects" className="block projects"><div className="shell"><Label icon={Code2}>Selected projects</Label><div className="section-head"><h2>Four systems, fully considered</h2><p>Projects taken directly from my resume.</p></div><div className="project-list">{projects.map(([code, title, date, stack, body], index) => <Reveal className="project" key={code}><div className="project-code"><span>{code}</span><time>{date}</time></div><div className="project-main"><span className="project-icon"><Code2 size={18} /></span><h3>{title}</h3><p className="stack">{stack}</p><p>{body}</p><a href="#contact">Discuss this project <ArrowUpRight size={15} /></a></div><span className="project-index">0{index + 1}</span></Reveal>)}</div></div></section>
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    }
-  };
+    <section id="skills" className="block skills"><div className="shell"><Label icon={Terminal}>Technical toolkit</Label><div className="two-col"><h2>Tools for the<br /><i>whole system.</i></h2><div className="skill-list">{skillGroups.map(([name, list]) => <div className="skill" key={name}><strong>{name}</strong><p>{list}</p></div>)}</div></div></div></section>
 
-  useEffect(() => {
-    setParticles(
-      [...Array(20)].map(() => ({
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        animationDuration: `${3 + Math.random() * 4}s`,
-      }))
-    );
-  }, []);
+    <section id="education" className="block education"><div className="shell"><Label icon={GraduationCap}>Education and recognition</Label><div className="education-layout"><div><h2>Education</h2><article className="education-item"><School size={19} /><div><h3>Bachelor of Science in Computer Science</h3><p>National University of Computer and Emerging Sciences, Karachi</p><time>Aug 2023 to Jun 2027</time></div></article><article className="education-item"><BookOpen size={19} /><div><h3>IGCSE and A Levels, Pre Engineering and Computer Science</h3><p>Cedar College, Karachi</p><time>Oct 2022 to Jun 2023</time></div></article></div><div><h2>Honors and awards <Trophy size={25} /></h2><div className="award-list">{awards.map(([title, detail]) => <div className="award" key={title + detail}><Award size={16} /><span><strong>{title}</strong><small>{detail}</small></span></div>)}</div></div></div></div></section>
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950 text-white">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/4 w-60 h-60 bg-cyan-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
-
-      {/* Floating Particles */}
-      <div className="fixed inset-0 pointer-events-none">
-        {particles.map((style, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-cyan-400/20 rounded-full animate-float"
-            style={style}
-          />
-        ))}
-      </div>
-
-      {/* Fixed Navigation Bar */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur transition-all duration-300`}
-      >
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex justify-center items-center space-x-1 md:space-x-4 flex-wrap">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
-                  activeSection === item.id
-                    ? "bg-gradient-to-r from-blue-800 to-cyan-800 text-white shadow-lg"
-                    : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
-                }`}
-              >
-                <span className="hidden md:inline">{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-24 pb-12">
-        {/* Hero Section */}
-        <section className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <div className="flex flex-col md:flex-row items-center gap-8 animate-slide-in">
-              <div
-                className="relative group cursor-pointer"
-                onClick={openModal}
-              >
-                <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/50 animate-pulse-glow">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-800/20 z-10"></div>
-                  <Image
-                    src="/procom-event.jpg"
-                    alt="Zubair Ahmed - Professional Photo"
-                    fill
-                    className="object-cover rounded-full transition-transform duration-500 group-hover:scale-110"
-                    priority
-                    sizes="(max-width: 768px) 12rem, 14rem"
-                  />
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 rounded-full">
-                    <div className="text-center p-4">
-                      <FaExpand className="text-4xl text-white mx-auto mb-2" />
-                      <p className="text-white font-semibold">
-                        Click to View Full Image
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Name Display - Only here */}
-                <div className="mt-6 text-center">
-                  <h1 className="text-4xl font-bold text-gradient">
-                    Zubair Ahmed
-                  </h1>
-                  <div className="mt-2 w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full"></div>
-                </div>
-              </div>
-
-              <div className="flex-1">
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  <span className="block text-gradient">
-                    Software Developer
-                  </span>
-                </h2>
-                <p className="text-gray-300 mb-6 text-lg leading-relaxed">
-                  CS undergrad proficient in database management, system-level
-                  applications, game engines, automation tools, &amp;
-                  simulators. Skilled in high &amp; low-level programming.
-                  Focused on building efficient, scalable low-level solutions.
-                </p>
-
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <a
-                    href="https://linkedin.com/in/zubair-ahmed-448041344"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/30"
-                  >
-                    <FaLinkedin className="text-xl" /> LinkedIn
-                  </a>
-                  <a
-                    href="https://github.com/zahmed02"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gray-500/30"
-                  >
-                    <FaGithub className="text-xl" /> GitHub
-                  </a>
-                  <a
-                    href="/ZA_Resume.pdf"
-                    download="Zubair_Ahmed_Resume.pdf"
-                    className="flex items-center gap-2 bg-gradient-to-r from-cyan-700 to-cyan-600 hover:from-cyan-600 hover:to-cyan-500 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/30"
-                  >
-                    <FaDownload className="text-xl" /> Download Resume
-                  </a>
-                </div>
-
-                <div className="text-gray-400 text-sm">
-                  <p>
-                    📍 Karachi, Pakistan | 📧 zahmad2812@gmail.com | 📞
-                    +92-320-3060747
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* About Section */}
-        <section id="about" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaGraduationCap className="text-cyan-400" />
-              About Me
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover">
-                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                  Background
-                </h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Currently pursuing BS in Computer Science at FAST-NUCES
-                  Karachi. Passionate about systems programming, database
-                  management, and building efficient software solutions.
-                  Experienced in both high-level and low-level programming with
-                  a focus on performance optimization.
-                </p>
-              </div>
-
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 card-hover">
-                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                  Contact Info
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition-colors">
-                    <FaPhone className="text-cyan-400" />
-                    <span>+92-320-3060747</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition-colors">
-                    <FaEnvelope className="text-cyan-400" />
-                    <span>zahmad2812@gmail.com</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition-colors">
-                    <FaMapMarkerAlt className="text-cyan-400" />
-                    <span>Karachi, Sindh 75290</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Education Section */}
-        <section id="education" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaGraduationCap className="text-cyan-400" />
-              Education
-            </h2>
-            <div className="space-y-6">
-              {[
-                {
-                  title: "Bachelor of Science in Computer Science",
-                  institution: "FAST-NUCES, Karachi",
-                  period: "Sep 2023 – Jun 2027",
-                  color: "cyan",
-                },
-                {
-                  title: "IGCSE A Levels (Mathematics & CS)",
-                  institution: "Cedar College, Karachi",
-                  period: "Oct 2022 – Jun 2023",
-                  color: "blue",
-                },
-                {
-                  title: "IGCSE O Levels (General Studies)",
-                  institution:
-                    "Montessori Complex Cambridge School (MCCS), Karachi",
-                  period: "May 2019 – Jun 2020 | Score: 2A*, 5A",
-                  color: "purple",
-                },
-              ].map((edu, index) => (
-                <div
-                  key={index}
-                  className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-cyan-500 hover:border-cyan-400 transition-all duration-300 transform hover:-translate-y-1 card-hover"
-                >
-                  <h3 className="text-xl font-semibold text-white">
-                    {edu.title}
-                  </h3>
-                  <p className="text-cyan-300 mt-2">{edu.institution}</p>
-                  <p className="text-gray-400 mt-1">{edu.period}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Experience Section */}
-        <section id="experience" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaBriefcase className="text-cyan-400" />
-              Experience
-            </h2>
-            <div className="space-y-8">
-              {[
-                {
-                  title: "Web Development Intern",
-                  company: "HUM Network Ltd",
-                  period: "June 2025 – July 2025",
-                  color: "cyan",
-                  points: [
-                    "Built responsive full-stack websites with interactive UIs, CRUD functionality",
-                    "Implemented relational database schemas and session-based authentication",
-                    "Designed RESTful APIs for data exchange across various systems",
-                  ],
-                },
-                {
-                  title: "Undergraduate Teaching Assistant",
-                  company: "FAST-NUCES",
-                  period: "Feb 2025 – May 2025",
-                  color: "blue",
-                  points: [
-                    "Assisted in teaching MT-1008 Multivariate Calculus",
-                    "Assisted in teaching SS-1013 Ideology & Constitution of Pakistan",
-                  ],
-                },
-                {
-                  title: "Assessment Management & Technical Operations",
-                  company: "PROCOM & Developer's Day",
-                  period: "Feb 2025 – Apr 2025",
-                  color: "purple",
-                  points: [
-                    "Designed competitive programming problems and MCQs",
-                    "Managed technical logistics and server setup",
-                    "Performed live troubleshooting during events",
-                  ],
-                },
-              ].map((exp, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover"
-                >
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                    <div>
-                      <h3 className="text-xl font-semibold text-white">
-                        {exp.title}
-                      </h3>
-                      <p className="text-cyan-300">{exp.company}</p>
-                    </div>
-                    <span className="bg-cyan-900/50 text-cyan-300 px-4 py-2 rounded-full text-sm font-medium">
-                      {exp.period}
-                    </span>
-                  </div>
-                  <ul className="space-y-2">
-                    {exp.points.map((point, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-start gap-3 text-gray-300"
-                      >
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Skills Section */}
-        <section id="skills" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaCode className="text-cyan-400" />
-              Technical Skills
-            </h2>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "Languages",
-                  skills: [
-                    "C/C++",
-                    "C#",
-                    "Python",
-                    "Java",
-                    "JavaScript/TypeScript",
-                    "Go",
-                    "R",
-                    "Assembly(x86)",
-                    "Bash/Shell",
-                  ],
-                  color: "gray",
-                },
-                {
-                  title: "Databases",
-                  skills: ["SQL", "MongoDB", "PostgreSQL", "MySQL", "NoSQL"],
-                  color: "blue",
-                },
-                {
-                  title: "Web Technologies",
-                  skills: [
-                    "HTML",
-                    "CSS",
-                    "TailwindCSS",
-                    "React",
-                    "Next.js",
-                    "PHP",
-                    "jQuery",
-                  ],
-                  color: "purple",
-                },
-                {
-                  title: "Data Science & ML",
-                  skills: [
-                    "Pandas",
-                    "NumPy",
-                    "Scikit-Learn",
-                    "R",
-                    "dplyr",
-                    "ggplot2",
-                    "tidyr",
-                  ],
-                  color: "green",
-                },
-                {
-                  title: "Infrastructure & Tools",
-                  skills: [
-                    "Ubuntu-Linux",
-                    "Git",
-                    "LaTeX",
-                    "Irvine32",
-                    "System Design",
-                  ],
-                  color: "yellow",
-                },
-                {
-                  title: "Core Concepts",
-                  skills: [
-                    "OOP",
-                    "Functional Programming",
-                    "Data Structures",
-                    "Algorithms",
-                    "LLMs",
-                    "AI/ML",
-                    "Cybersecurity",
-                  ],
-                  color: "red",
-                },
-              ].map((category, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover group"
-                >
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300 group-hover:text-cyan-400 transition-colors">
-                    {category.title}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {category.skills.map((skill, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-700/30 hover:bg-gray-600/50 text-gray-300 hover:text-white transition-all duration-300 cursor-default hover:scale-105"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Certifications Section */}
-        <section id="certifications" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaCertificate className="text-cyan-400" />
-              Certifications & Learning Platforms
-            </h2>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  name: "CodeSignal",
-                  url: "https://codesignal.com/learn/course-paths",
-                  icon: <SiCodesignal />,
-                  color: "orange",
-                },
-                {
-                  name: "SoloLearn",
-                  url: "https://www.sololearn.com/en/profile/27122128",
-                  icon: <SiSololearn />,
-                  color: "blue",
-                },
-                {
-                  name: "Google Skillshop",
-                  url: "https://skillshop.docebosaas.com/learn",
-                  icon: <TbWorld />,
-                  color: "green",
-                },
-                {
-                  name: "LIFE Global",
-                  url: "https://www.life-global.org/",
-                  icon: <TbWorld />,
-                  color: "purple",
-                },
-                {
-                  name: "HackerRank",
-                  url: "https://www.hackerrank.com/dashboard",
-                  icon: <SiHackerrank />,
-                  color: "emerald",
-                },
-                {
-                  name: "Cisco NetAcad",
-                  url: "https://www.netacad.com/",
-                  icon: <TbWorld />,
-                  color: "red",
-                },
-              ].map((platform, index) => (
-                <a
-                  key={index}
-                  href={platform.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500 transition-all duration-300 card-hover group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="text-4xl text-orange-500 group-hover:scale-110 transition-transform">
-                      {platform.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold text-white group-hover:text-cyan-300 transition-colors">
-                      {platform.name}
-                    </h3>
-                  </div>
-                  <p className="text-gray-400 group-hover:text-gray-300 transition-colors">
-                    {platform.name === "Google Skillshop"
-                      ? "Google's official certification platform"
-                      : platform.name === "SoloLearn"
-                      ? "Interactive coding tutorials and certifications"
-                      : platform.name === "CodeSignal"
-                      ? "Programming courses and certification paths"
-                      : platform.name === "LIFE Global"
-                      ? "Leadership and professional development"
-                      : platform.name === "HackerRank"
-                      ? "Coding challenges and skill assessments"
-                      : "Networking and IT certifications"}
-                  </p>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section id="contact" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaEnvelope className="text-cyan-400" />
-              Get In Touch
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  type: "Email",
-                  value: "zahmad2812@gmail.com",
-                  icon: <FaEnvelope />,
-                  color: "cyan",
-                  href: "mailto:zahmad2812@gmail.com",
-                },
-                {
-                  type: "LinkedIn",
-                  value: "Connect professionally",
-                  icon: <FaLinkedin />,
-                  color: "blue",
-                  href: "https://linkedin.com/in/zubair-ahmed-448041344",
-                },
-                {
-                  type: "GitHub",
-                  value: "View my projects",
-                  icon: <FaGithub />,
-                  color: "gray",
-                  href: "https://github.com/zahmed02",
-                },
-              ].map((contact, index) => (
-                <a
-                  key={index}
-                  href={contact.href}
-                  target={contact.type !== "Email" ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="bg-gradient-to-br from-cyan-800/20 to-cyan-900/20 rounded-xl p-8 text-center hover:from-cyan-800/40 hover:to-cyan-900/40 transition-all duration-300 card-hover group"
-                >
-                  <div className="text-5xl text-cyan-400 mb-6 mx-auto group-hover:scale-110 transition-transform">
-                    {contact.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 text-white">
-                    {contact.type}
-                  </h3>
-                  <p className="text-gray-300 group-hover:text-white transition-colors">
-                    {contact.value}
-                  </p>
-                </a>
-              ))}
-            </div>
-
-            {/* Additional Contact Info */}
-            <div className="mt-12 grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-800/30 rounded-xl p-6">
-                <h4 className="text-lg font-semibold mb-4 text-cyan-300">
-                  Quick Contact
-                </h4>
-                <div className="space-y-3">
-                  <p className="text-gray-300">
-                    Feel free to reach out for collaborations or just a friendly
-                    hello!
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    Response time: Usually within 24 hours
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-800/30 rounded-xl p-6">
-                <h4 className="text-lg font-semibold mb-4 text-cyan-300">
-                  Availability
-                </h4>
-                <div className="space-y-2">
-                  <p className="text-gray-300">
-                    🟢 Open to internship opportunities
-                  </p>
-                  <p className="text-gray-300">
-                    🟢 Available for freelance projects
-                  </p>
-                  <p className="text-gray-300">
-                    🟢 Accepting mentorship requests
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-gray-700/50 text-center text-gray-400">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"></div>
-            <p className="text-lg">
-              © {new Date().getFullYear()} Zubair Ahmed. All rights reserved.
-            </p>
-            <p className="text-gray-500">
-              Built with Next.js & Tailwind CSS | Deployed on GitHub Pages
-            </p>
-            <div className="flex justify-center space-x-6 mt-4">
-              <a
-                href="https://github.com/zahmed02/zahmed02.github.io"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-cyan-300 transition-colors"
-              >
-                Source Code
-              </a>
-              <a
-                href="/ZA_Resume.pdf"
-                download="Zubair_Ahmed_Resume.pdf"
-                className="hover:text-cyan-300 transition-colors"
-              >
-                Download Resume
-              </a>
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="hover:text-cyan-300 transition-colors"
-              >
-                Back to Top
-              </button>
-            </div>
-          </div>
-        </footer>
-      </div>
-
-      {/* Image Modal - Full Screen View */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
-          onClick={closeModal}
-        >
-          <div
-            className="relative w-full h-full flex flex-col items-center justify-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 md:top-8 md:right-8 text-white hover:text-cyan-300 text-3xl md:text-4xl transition-colors z-50 bg-black/50 rounded-full p-2"
-            >
-              <FaTimes />
-            </button>
-
-            <div className="relative w-full h-full max-w-[90vw] max-h-[90vh] rounded-lg overflow-hidden">
-              <Image
-                src="/procom-event.jpg"
-                alt="Zubair Ahmed - Professional Photo"
-                width={3119}
-                height={4160}
-                className="object-contain w-full h-full"
-                priority
-              />
-            </div>
-
-            <div className="text-center mt-6 text-white">
-              <p className="text-2xl font-bold text-gradient">Zubair Ahmed</p>
-              <p className="text-lg text-gray-300 mt-2">
-                Systems Software Engineer & Full-Stack Developer
-              </p>
-              <button
-                onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = "/procom-event.jpg";
-                  link.download = "Zubair_Ahmed_Professional_Photo.jpg";
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
-                className="mt-4 px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-lg transition-all duration-300 flex items-center gap-2 mx-auto"
-              >
-                <FaDownload /> Download Photo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    <footer id="contact" className="footer"><div className="shell"><Label icon={Mail}>Contact</Label><div className="footer-top"><h2>Let us solve<br /><i>something useful.</i></h2><a className="email" href="mailto:zahmad2812@gmail.com">zahmad2812@gmail.com <ArrowUpRight size={20} /></a></div><div className="footer-bottom"><div><strong>Zubair Ahmed</strong><span>Computer Science student, software development, systems engineering and applied AI</span></div><div className="socials"><a href="https://github.com/zahmed02" aria-label="GitHub"><Code2 /></a><a href="https://linkedin.com/in/zubair-ahmed-448041344" aria-label="LinkedIn"><Share2 /></a><a href="tel:+923203060747" aria-label="Phone"><Phone /></a></div><small>{visits ? `${visits} visits` : "Karachi, Pakistan"}</small></div></div></footer>
+  </main>;
 }
