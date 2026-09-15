@@ -9,9 +9,13 @@ import {
 } from "lucide-react";
 import { getSupabase } from "../lib/supabase-browser";
 
+const profileImage = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/2025-02-18%20Event%20PROCOM-dylV9Y2yzk6qyhQM8C0AjaASoyW6kE.jpeg";
+
 const backgroundImages = [
-  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a-dynamic-swirl-of-black-and-white-fluid-captures-motion-and-contrast-in-an-artistic-arrangement-on-a-bright-background-photo-n8FROStgIzcG2WAZo1kfL6VgQWEAQO.jpg",
-  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dynamic-motion-blur-stockcake-FcewS1jd0ArTWmN7xXd8izdVnyCBl4.jpg",
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dynamic-motion-blur-stockcake-OiVKyJP3UzNorIS3d9Ol374R5k2kDF.jpg",
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dynamic-motion-blur-stockcake%20%281%29-ivWPtr741o2DYI9cIMwrBhJ4cswUFA.jpg",
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/images.jfif-cFzfvfo388CXASsVyg5wSrHrIsJbTS.jpeg",
+  "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/a-dynamic-swirl-of-black-and-white-fluid-captures-motion-and-contrast-in-an-artistic-arrangement-on-a-bright-background-photo-JzAZU6tgXbsHjVdySjSe3Dm84m2CIR.jpg",
 ];
 
 const experience = [
@@ -53,7 +57,7 @@ const awards = [
 
 function MotionBackdrop() {
   const [active, setActive] = useState(0);
-  useEffect(() => { const timer = window.setInterval(() => setActive((value) => value === 0 ? 1 : 0), 10000); return () => window.clearInterval(timer); }, []);
+  useEffect(() => { const timer = window.setInterval(() => setActive((value) => (value + 1) % backgroundImages.length), 10000); return () => window.clearInterval(timer); }, []);
   return <div className="motion-backdrop" aria-hidden="true"><AnimatePresence mode="sync"><motion.div key={active} className="backdrop-image" style={{ backgroundImage: `url(${backgroundImages[active]})` }} initial={{ opacity: 0, scale: 1.08 }} animate={{ opacity: 0.16, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 3.2, ease: "easeInOut" }} /></AnimatePresence><div className="backdrop-wash" /></div>;
 }
 
@@ -74,7 +78,7 @@ export default function Page() {
     <MotionBackdrop /><motion.div className="progress" style={{ scaleX: progress }} />
     <header className="header"><a className="brand" href="#home" onClick={close}><span>ZA</span><strong>Zubair Ahmed</strong></a><nav className={menuOpen ? "open" : ""}>{["About", "Experience", "Projects", "Education", "Contact"].map((item) => <a key={item} href={`#${item.toLowerCase()}`} onClick={close}>{item}</a>)}</nav><a className="header-contact" href="mailto:zahmad2812@gmail.com"><Mail size={15} /> Contact</a><button className="menu" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle navigation">{menuOpen ? <X /> : <Menu />}</button></header>
 
-    <section id="home" className="hero shell"><div className="hero-content"><Reveal><p className="kicker"><span className="pulse" /> Computer Science and Applied AI</p></Reveal><Reveal><h1>Engineering ideas<br /><i>into useful systems.</i></h1></Reveal><Reveal><p className="lede">Computer Science student at FAST NUCES with experience in software development, systems engineering and applied AI. Passionate about building scalable applications and exploring emerging technologies.</p></Reveal><Reveal className="hero-actions"><a className="primary" href="#projects">View selected work <ArrowDown size={16} /></a><a className="underlined" href="/ZA_Resume.pdf" target="_blank" rel="noreferrer">Resume <ExternalLink size={15} /></a></Reveal></div><div className="identity-card"><div className="portrait-frame"><div className="portrait-mark">ZA</div></div><div><strong>Karachi, Sindh</strong><span>Available for meaningful work</span></div></div></section>
+    <section id="home" className="hero shell"><div className="hero-content"><Reveal><p className="kicker"><span className="pulse" /> Computer Science and Applied AI</p></Reveal><Reveal><h1>Engineering ideas<br /><i>into useful systems.</i></h1></Reveal><Reveal><p className="lede">Computer Science student at FAST NUCES with experience in software development, systems engineering and applied AI. Passionate about building scalable applications and exploring emerging technologies.</p></Reveal><Reveal className="hero-actions"><a className="primary" href="#projects">View selected work <ArrowDown size={16} /></a><a className="underlined" href="/ZA_Resume.pdf" target="_blank" rel="noreferrer">Resume <ExternalLink size={15} /></a></Reveal></div><div className="identity-card"><div className="portrait-frame"><img src={profileImage} alt="Zubair Ahmed at PROCOM 25" /><span className="portrait-mark">ZA</span></div><div><strong>Karachi, Sindh</strong><span>Available for meaningful work</span></div></div></section>
 
     <section id="about" className="block about"><div className="shell"><Label icon={Users}>Profile</Label><div className="two-col"><div><h2>Curious by nature.<br /><i>Precise by practice.</i></h2></div><div className="profile-copy"><p>Computer Science student with experience in software development, systems engineering and applied AI. Passionate about building scalable applications and exploring emerging technologies, seeking roles that blend engineering with research.</p><div className="facts"><span><MapPin size={16} /> Karachi, Sindh</span><span><GraduationCap size={16} /> FAST NUCES, 2023 to 2027</span><span><Terminal size={16} /> Software and AI</span><span><Users size={16} /> Teaching and mentoring</span></div></div></div></div></section>
 
