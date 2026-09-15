@@ -6,13 +6,12 @@ html { scroll-behavior: smooth; }
 body { margin: 0; background: var(--ink); color: var(--paper); font-family: Arial, Helvetica, sans-serif; }
 button, a { font: inherit; } a { color: inherit; text-decoration: none; } button { border: 0; cursor: pointer; }
 .site-shell { position: relative; isolation: isolate; overflow: hidden; background: radial-gradient(circle at 65% 10%, rgba(93,82,177,.16), transparent 33%), var(--ink); }
-.motion-field { position: absolute; inset: 0 0 auto; height: 920px; overflow: hidden; pointer-events: auto; z-index: -1; background: radial-gradient(ellipse at center, rgba(255,255,255,.03), transparent 65%); }
-.field-grid { position: absolute; inset: 0; opacity: .28; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 60px 60px; mask-image: linear-gradient(to bottom, black, transparent 86%); }
-.ink-ribbon { position: absolute; width: 900px; height: 145px; border-radius: 50%; filter: blur(18px); opacity: .48; transition: transform 1.2s cubic-bezier(.2,.7,.2,1); animation: drift 11s ease-in-out infinite alternate; }
-.ribbon-one { top: 270px; left: -130px; background: linear-gradient(90deg, transparent, rgba(215,255,112,.42), rgba(167,139,250,.45), transparent); box-shadow: 0 0 70px rgba(215,255,112,.18); }
-.ribbon-two { top: 445px; right: -210px; background: linear-gradient(90deg, transparent, rgba(120,200,255,.33), rgba(255,173,112,.35), transparent); animation-delay: -4s; }
-.ink-orb { position: absolute; width: 230px; height: 230px; margin: -115px; border-radius: 50%; background: radial-gradient(circle, rgba(215,255,112,.14), transparent 68%); filter: blur(16px); transition: left .7s ease, top .7s ease; }
-@keyframes drift { from { margin-left: -40px; } to { margin-left: 70px; } }
+.particle-field { position: absolute; inset: 0 0 auto; height: 1500px; overflow: hidden; pointer-events: auto; z-index: -1; background: radial-gradient(circle at 50% 10%, rgba(145,120,255,.2), transparent 34%), radial-gradient(circle at 12% 32%, rgba(215,255,112,.08), transparent 28%); }
+.particle-field canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .9; }
+.motion-image { position: absolute; inset: 0; opacity: .075; background-image: url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dynamic-motion-blur-stockcake-ue1shtCgI06pyNmU9Q8X4PKnMXvpzq.jpg'); background-size: cover; background-position: center; mix-blend-mode: screen; filter: grayscale(1) contrast(1.35); animation: image-drift 18s ease-in-out infinite alternate; }
+.motion-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, var(--ink) 82%); }
+@keyframes image-drift { from { transform: scale(1.08) translate3d(-1%, -1%, 0); } to { transform: scale(1.18) translate3d(1%, 1%, 0); } }
+.scroll-progress { position: fixed; z-index: 20; left: 0; top: 0; height: 3px; background: var(--lime); box-shadow: 0 0 18px rgba(215,255,112,.75); transform-origin: left; }
 .section-wrap { width: min(1160px, calc(100% - 56px)); margin: 0 auto; }
 .site-header { position: relative; z-index: 4; width: min(1160px, calc(100% - 56px)); height: 82px; margin: 20px auto 0; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--line); border-radius: 18px; background: rgba(15,16,20,.62); backdrop-filter: blur(18px); }
 .wordmark { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }.wordmark span, .footer-brand > span { color: var(--lime); font-weight: 900; letter-spacing: 0; }.wordmark b { font-weight: 500; }
