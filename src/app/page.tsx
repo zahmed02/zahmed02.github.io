@@ -1,755 +1,107 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import {
-  FaLinkedin,
-  FaGithub,
-  FaGraduationCap,
-  FaBriefcase,
-  FaCertificate,
-  FaCode,
-  FaEnvelope,
-  FaPhone,
-  FaMapMarkerAlt,
-  FaDownload,
-  FaExpand,
-  FaTimes,
-} from "react-icons/fa";
-import { SiCodesignal, SiSololearn, SiHackerrank } from "react-icons/si";
-import { TbWorld } from "react-icons/tb";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { getSupabase } from "../lib/supabase-browser";
+import {
+  ArrowUpRight,
+  Award,
+  BookOpen,
+  Code2,
+  Download,
+  GitBranch,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Menu,
+  School,
+  Sparkles,
+  Terminal,
+  Trophy,
+  Users,
+  X,
+} from "lucide-react";
+
+const navItems = ["About", "Work", "Education", "Skills", "Contact"];
+
+const experience = [
+  { period: "2025 — 2026", role: "Co-Head, Computer Science Competitions", company: "PROCOM", detail: "Led competition delivery, problem design, technical logistics, and live operations for a major university technology event." },
+  { period: "2025", role: "Web Development Intern", company: "HUM Network Ltd", detail: "Built responsive full-stack interfaces, CRUD workflows, relational schemas, session authentication, and REST APIs." },
+  { period: "2025", role: "Assessment & Technical Operations", company: "Developers' Day — ACM NUCES", detail: "Managed assessments, competition logistics, server setup, and technical troubleshooting under live event pressure." },
+  { period: "2025", role: "Undergraduate Teaching Assistant", company: "FAST-NUCES", detail: "Supported teaching and student learning across Multivariate Calculus and Ideology & Constitution of Pakistan." },
+];
+
+const projects = [
+  { number: "01", title: "Systems-minded software", description: "Building practical tools across database management, automation, simulators, and interactive applications — with performance and reliability in mind.", tags: ["C++", "Python", "SQL"] },
+  { number: "02", title: "Applied AI exploration", description: "Exploring agentic artificial intelligence, intelligent workflows, and the engineering patterns that turn models into useful products.", tags: ["Agentic AI", "APIs", "Research"] },
+  { number: "03", title: "Technical leadership", description: "Designing the systems behind competitions and events: clear assessments, dependable infrastructure, and calm execution when it matters.", tags: ["Leadership", "Operations", "Problem Solving"] },
+];
+
+const skills = ["C / C++", "Python", "Java", "JavaScript", "SQL & Databases", "REST APIs", "Git & GitHub", "Systems Programming", "Automation", "Agentic AI"];
 
 export default function Page() {
-  const [activeSection, setActiveSection] = useState("about");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [particles, setParticles] = useState<
-    { left: string; top: string; animationDelay: string; animationDuration: string }[]
-  >([]);
-
-  const navItems = useMemo(
-    () => [
-      { id: "about", label: "About", icon: <FaGraduationCap /> },
-      { id: "education", label: "Education", icon: <FaGraduationCap /> },
-      { id: "experience", label: "Experience", icon: <FaBriefcase /> },
-      { id: "skills", label: "Skills", icon: <FaCode /> },
-      {
-        id: "certifications",
-        label: "Certifications",
-        icon: <FaCertificate />,
-      },
-      { id: "contact", label: "Contact", icon: <FaEnvelope /> },
-    ],
-    []
-  );
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [visits, setVisits] = useState<number | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Update active section based on scroll
-      const sections = navItems.map((item) => item.id);
-      const current = sections.find((section) => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          return rect.top <= 100 && rect.bottom >= 100;
-        }
-        return false;
-      });
-
-      if (current) {
-        setActiveSection(current);
+    const counted = sessionStorage.getItem("za-visit-counted");
+    const loadVisits = async () => {
+      const supabase = getSupabase();
+      if (!supabase) return;
+      if (!counted) {
+        const { data } = await supabase.rpc("increment_site_visit", { stat_id: "portfolio" });
+        if (typeof data === "number") setVisits(data);
+        sessionStorage.setItem("za-visit-counted", "true");
+        return;
       }
+      const { data } = await supabase.from("site_stats").select("visits").eq("id", "portfolio").maybeSingle();
+      if (typeof data?.visits === "number") setVisits(data.visits);
     };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [navItems]);
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  useEffect(() => {
-    setParticles(
-      [...Array(20)].map(() => ({
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 5}s`,
-        animationDuration: `${3 + Math.random() * 4}s`,
-      }))
-    );
+    loadVisits().catch(() => setVisits(null));
   }, []);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const scrollTo = (id: string) => {
+    document.getElementById(id.toLowerCase())?.scrollIntoView({ behavior: "smooth" });
+    setMenuOpen(false);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950 text-white">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/4 w-60 h-60 bg-cyan-900/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      </div>
+    <main className="site-shell">
+      <header className="site-header">
+        <a className="wordmark" href="#about" aria-label="Zubair Ahmed home"><span>ZA</span> / portfolio</a>
+        <nav className={`main-nav ${menuOpen ? "is-open" : ""}`} aria-label="Primary navigation">
+          {navItems.map((item) => <button key={item} onClick={() => scrollTo(item)}>{item}</button>)}
+          <a href="/ZA_Resume.pdf" download="Zubair_Ahmed_Resume.pdf" className="nav-resume">Resume <Download size={14} /></a>
+        </nav>
+        <button className="menu-toggle" aria-label={menuOpen ? "Close menu" : "Open menu"} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</button>
+      </header>
 
-      {/* Floating Particles */}
-      <div className="fixed inset-0 pointer-events-none">
-        {particles.map((style, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-cyan-400/20 rounded-full animate-float"
-            style={style}
-          />
-        ))}
-      </div>
-
-      {/* Fixed Navigation Bar */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur transition-all duration-300`}
-      >
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex justify-center items-center space-x-1 md:space-x-4 flex-wrap">
-            {navItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 font-medium ${
-                  activeSection === item.id
-                    ? "bg-gradient-to-r from-blue-800 to-cyan-800 text-white shadow-lg"
-                    : "text-gray-300 hover:bg-gray-800/50 hover:text-white"
-                }`}
-              >
-                <span className="hidden md:inline">{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
+      <section id="about" className="hero section-wrap">
+        <div className="hero-copy">
+          <p className="eyebrow"><span className="status-dot" /> Available for meaningful work</p>
+          <h1>Building useful<br /><em>systems</em> with intent.</h1>
+          <p className="hero-intro">I&apos;m Zubair Ahmed — a Computer Science undergraduate and software developer focused on systems, applied AI, and the details that make technology work.</p>
+          <div className="hero-actions"><button className="button button-primary" onClick={() => scrollTo("work")}>View selected work <ArrowUpRight size={17} /></button><a className="button button-quiet" href="mailto:zahmad2812@gmail.com">Let&apos;s talk <Mail size={16} /></a></div>
+          <div className="hero-meta"><span><MapPin size={15} /> Karachi, Pakistan</span><span><Terminal size={15} /> CS @ FAST-NUCES</span></div>
         </div>
-      </nav>
+        <div className="hero-portrait-wrap"><div className="portrait-frame"><Image src="/procom-event.jpg" alt="Zubair Ahmed at a technology event" fill priority sizes="(max-width: 768px) 88vw, 390px" /></div><div className="portrait-note"><span>01 / 04</span><span>Software · AI · Systems</span></div></div>
+      </section>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-24 pb-12">
-        {/* Hero Section */}
-        <section className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <div className="flex flex-col md:flex-row items-center gap-8 animate-slide-in">
-              <div
-                className="relative group cursor-pointer"
-                onClick={openModal}
-              >
-                <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-cyan-400 shadow-lg shadow-cyan-500/50 animate-pulse-glow">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 to-blue-800/20 z-10"></div>
-                  <Image
-                    src="/procom-event.jpg"
-                    alt="Zubair Ahmed - Professional Photo"
-                    fill
-                    className="object-cover rounded-full transition-transform duration-500 group-hover:scale-110"
-                    priority
-                    sizes="(max-width: 768px) 12rem, 14rem"
-                  />
+      <section className="ticker" aria-label="Focus areas"><div className="ticker-track"><span>Software development</span><span>Applied artificial intelligence</span><span>Technical leadership</span><span>Systems thinking</span><span>Software development</span><span>Applied artificial intelligence</span></div></section>
 
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 rounded-full">
-                    <div className="text-center p-4">
-                      <FaExpand className="text-4xl text-white mx-auto mb-2" />
-                      <p className="text-white font-semibold">
-                        Click to View Full Image
-                      </p>
-                    </div>
-                  </div>
-                </div>
+      <section id="work" className="section-wrap content-section"><div className="section-heading"><p className="eyebrow">Selected focus</p><h2>Work that compounds.</h2><p className="section-lede">A few threads running through my work — from writing code to creating the conditions for other people to do their best work.</p></div><div className="project-grid">{projects.map((project) => <article className="project-card" key={project.number}><div className="project-number">{project.number}</div><div><h3>{project.title}</h3><p>{project.description}</p><div className="tag-list">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div><ArrowUpRight className="card-arrow" size={20} /></article>)}</div></section>
 
-                {/* Name Display - Only here */}
-                <div className="mt-6 text-center">
-                  <h1 className="text-4xl font-bold text-gradient">
-                    Zubair Ahmed
-                  </h1>
-                  <div className="mt-2 w-24 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto rounded-full"></div>
-                </div>
-              </div>
+      <section className="section-wrap split-section" id="experience"><div className="section-heading sticky-heading"><p className="eyebrow">Experience</p><h2>Learn by doing.</h2><p className="section-lede">Whether shipping software or running a competition, I care about ownership, clarity, and outcomes.</p></div><div className="timeline">{experience.map((item) => <article className="timeline-item" key={item.role}><span className="timeline-period">{item.period}</span><div><h3>{item.role}</h3><p className="company">{item.company}</p><p>{item.detail}</p></div></article>)}</div></section>
 
-              <div className="flex-1">
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                  <span className="block text-gradient">
-                    Software Developer
-                  </span>
-                </h2>
-                <p className="text-gray-300 mb-6 text-lg leading-relaxed">
-                  CS undergrad proficient in database management, system-level
-                  applications, game engines, automation tools, &amp;
-                  simulators. Skilled in high &amp; low-level programming.
-                  Focused on building efficient, scalable low-level solutions.
-                </p>
+      <section id="education" className="section-wrap content-section"><div className="section-heading"><p className="eyebrow">Education & foundations</p><h2>Curiosity, structured.</h2></div><div className="education-grid"><article className="education-card featured"><GraduationCap size={24} /><p className="card-kicker">2023 — 2027</p><h3>BS Computer Science</h3><p>FAST-NUCES, Karachi</p><span>Current undergraduate</span></article><article className="education-card"><School size={22} /><p className="card-kicker">2022 — 2023</p><h3>A Levels</h3><p>Cedar College, Karachi</p><span>Computer Science · Mathematics · Physics · Chemistry</span></article><article className="education-card"><BookOpen size={22} /><p className="card-kicker">2019 — 2020</p><h3>O Levels</h3><p>Montessori Complex Cambridge School</p><span>2 A* and 5 A grades</span></article></div></section>
 
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <a
-                    href="https://linkedin.com/in/zubair-ahmed-448041344"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-blue-500/30"
-                  >
-                    <FaLinkedin className="text-xl" /> LinkedIn
-                  </a>
-                  <a
-                    href="https://github.com/zahmed02"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-gray-500/30"
-                  >
-                    <FaGithub className="text-xl" /> GitHub
-                  </a>
-                  <a
-                    href="/ZA_Resume.pdf"
-                    download="Zubair_Ahmed_Resume.pdf"
-                    className="flex items-center gap-2 bg-gradient-to-r from-cyan-700 to-cyan-600 hover:from-cyan-600 hover:to-cyan-500 px-5 py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-cyan-500/30"
-                  >
-                    <FaDownload className="text-xl" /> Download Resume
-                  </a>
-                </div>
+      <section id="skills" className="section-wrap skills-section"><div className="skills-intro"><p className="eyebrow">Toolkit</p><h2>Enough tools<br />to make ideas real.</h2></div><div className="skills-content"><p>I enjoy moving between abstraction levels — from architecture and databases to the interface a person actually touches.</p><div className="skill-cloud">{skills.map((skill) => <span key={skill}><Code2 size={14} />{skill}</span>)}</div></div></section>
 
-                <div className="text-gray-400 text-sm">
-                  <p>
-                    📍 Karachi, Pakistan | 📧 zahmad2812@gmail.com | 📞
-                    +92-320-3060747
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+      <section className="section-wrap recognition"><div><p className="eyebrow">Recognition</p><h2>Earned in the room.</h2></div><div className="awards"><div><Trophy /><p><strong>Star Performer Award</strong><br />PROCOM 25 · Management & Leadership</p></div><div><Award /><p><strong>Star Performer Award</strong><br />Developer&apos;s Day 25 · Assessment & General Management</p></div><div><Sparkles /><p><strong>Achievement Award</strong><br />Integration Bee 2023 · Mathematics Competition</p></div></div></section>
 
-        {/* About Section */}
-        <section id="about" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaGraduationCap className="text-cyan-400" />
-              About Me
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover">
-                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                  Background
-                </h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Currently pursuing BS in Computer Science at FAST-NUCES
-                  Karachi. Passionate about systems programming, database
-                  management, and building efficient software solutions.
-                  Experienced in both high-level and low-level programming with
-                  a focus on performance optimization.
-                </p>
-              </div>
+      <section id="contact" className="contact-section"><div className="section-wrap contact-inner"><div><p className="eyebrow">Have a good problem?</p><h2>Let&apos;s make<br /><em>something useful.</em></h2></div><a className="contact-email" href="mailto:zahmad2812@gmail.com">zahmad2812@gmail.com <ArrowUpRight /></a></div></section>
 
-              <div className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 card-hover">
-                <h3 className="text-xl font-semibold mb-4 text-cyan-300">
-                  Contact Info
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition-colors">
-                    <FaPhone className="text-cyan-400" />
-                    <span>+92-320-3060747</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition-colors">
-                    <FaEnvelope className="text-cyan-400" />
-                    <span>zahmad2812@gmail.com</span>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 bg-gray-900/50 rounded-lg hover:bg-gray-800/50 transition-colors">
-                    <FaMapMarkerAlt className="text-cyan-400" />
-                    <span>Karachi, Sindh 75290</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Education Section */}
-        <section id="education" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaGraduationCap className="text-cyan-400" />
-              Education
-            </h2>
-            <div className="space-y-6">
-              {[
-                {
-                  title: "Bachelor of Science in Computer Science",
-                  institution: "FAST-NUCES, Karachi",
-                  period: "Sep 2023 – Jun 2027",
-                  color: "cyan",
-                },
-                {
-                  title: "IGCSE A Levels (Mathematics & CS)",
-                  institution: "Cedar College, Karachi",
-                  period: "Oct 2022 – Jun 2023",
-                  color: "blue",
-                },
-                {
-                  title: "IGCSE O Levels (General Studies)",
-                  institution:
-                    "Montessori Complex Cambridge School (MCCS), Karachi",
-                  period: "May 2019 – Jun 2020 | Score: 2A*, 5A",
-                  color: "purple",
-                },
-              ].map((edu, index) => (
-                <div
-                  key={index}
-                  className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 border-l-4 border-cyan-500 hover:border-cyan-400 transition-all duration-300 transform hover:-translate-y-1 card-hover"
-                >
-                  <h3 className="text-xl font-semibold text-white">
-                    {edu.title}
-                  </h3>
-                  <p className="text-cyan-300 mt-2">{edu.institution}</p>
-                  <p className="text-gray-400 mt-1">{edu.period}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Experience Section */}
-        <section id="experience" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaBriefcase className="text-cyan-400" />
-              Experience
-            </h2>
-            <div className="space-y-8">
-              {[
-                {
-                  title: "Web Development Intern",
-                  company: "HUM Network Ltd",
-                  period: "June 2025 – July 2025",
-                  color: "cyan",
-                  points: [
-                    "Built responsive full-stack websites with interactive UIs, CRUD functionality",
-                    "Implemented relational database schemas and session-based authentication",
-                    "Designed RESTful APIs for data exchange across various systems",
-                  ],
-                },
-                {
-                  title: "Undergraduate Teaching Assistant",
-                  company: "FAST-NUCES",
-                  period: "Feb 2025 – May 2025",
-                  color: "blue",
-                  points: [
-                    "Assisted in teaching MT-1008 Multivariate Calculus",
-                    "Assisted in teaching SS-1013 Ideology & Constitution of Pakistan",
-                  ],
-                },
-                {
-                  title: "Assessment Management & Technical Operations",
-                  company: "PROCOM & Developer's Day",
-                  period: "Feb 2025 – Apr 2025",
-                  color: "purple",
-                  points: [
-                    "Designed competitive programming problems and MCQs",
-                    "Managed technical logistics and server setup",
-                    "Performed live troubleshooting during events",
-                  ],
-                },
-              ].map((exp, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover"
-                >
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                    <div>
-                      <h3 className="text-xl font-semibold text-white">
-                        {exp.title}
-                      </h3>
-                      <p className="text-cyan-300">{exp.company}</p>
-                    </div>
-                    <span className="bg-cyan-900/50 text-cyan-300 px-4 py-2 rounded-full text-sm font-medium">
-                      {exp.period}
-                    </span>
-                  </div>
-                  <ul className="space-y-2">
-                    {exp.points.map((point, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-start gap-3 text-gray-300"
-                      >
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></div>
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Skills Section */}
-        <section id="skills" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaCode className="text-cyan-400" />
-              Technical Skills
-            </h2>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  title: "Languages",
-                  skills: [
-                    "C/C++",
-                    "C#",
-                    "Python",
-                    "Java",
-                    "JavaScript/TypeScript",
-                    "Go",
-                    "R",
-                    "Assembly(x86)",
-                    "Bash/Shell",
-                  ],
-                  color: "gray",
-                },
-                {
-                  title: "Databases",
-                  skills: ["SQL", "MongoDB", "PostgreSQL", "MySQL", "NoSQL"],
-                  color: "blue",
-                },
-                {
-                  title: "Web Technologies",
-                  skills: [
-                    "HTML",
-                    "CSS",
-                    "TailwindCSS",
-                    "React",
-                    "Next.js",
-                    "PHP",
-                    "jQuery",
-                  ],
-                  color: "purple",
-                },
-                {
-                  title: "Data Science & ML",
-                  skills: [
-                    "Pandas",
-                    "NumPy",
-                    "Scikit-Learn",
-                    "R",
-                    "dplyr",
-                    "ggplot2",
-                    "tidyr",
-                  ],
-                  color: "green",
-                },
-                {
-                  title: "Infrastructure & Tools",
-                  skills: [
-                    "Ubuntu-Linux",
-                    "Git",
-                    "LaTeX",
-                    "Irvine32",
-                    "System Design",
-                  ],
-                  color: "yellow",
-                },
-                {
-                  title: "Core Concepts",
-                  skills: [
-                    "OOP",
-                    "Functional Programming",
-                    "Data Structures",
-                    "Algorithms",
-                    "LLMs",
-                    "AI/ML",
-                    "Cybersecurity",
-                  ],
-                  color: "red",
-                },
-              ].map((category, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500/50 transition-all duration-300 card-hover group"
-                >
-                  <h3 className="text-xl font-semibold mb-4 text-cyan-300 group-hover:text-cyan-400 transition-colors">
-                    {category.title}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {category.skills.map((skill, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1.5 rounded-full text-sm font-medium bg-gray-700/30 hover:bg-gray-600/50 text-gray-300 hover:text-white transition-all duration-300 cursor-default hover:scale-105"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Certifications Section */}
-        <section id="certifications" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaCertificate className="text-cyan-400" />
-              Certifications & Learning Platforms
-            </h2>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  name: "CodeSignal",
-                  url: "https://codesignal.com/learn/course-paths",
-                  icon: <SiCodesignal />,
-                  color: "orange",
-                },
-                {
-                  name: "SoloLearn",
-                  url: "https://www.sololearn.com/en/profile/27122128",
-                  icon: <SiSololearn />,
-                  color: "blue",
-                },
-                {
-                  name: "Google Skillshop",
-                  url: "https://skillshop.docebosaas.com/learn",
-                  icon: <TbWorld />,
-                  color: "green",
-                },
-                {
-                  name: "LIFE Global",
-                  url: "https://www.life-global.org/",
-                  icon: <TbWorld />,
-                  color: "purple",
-                },
-                {
-                  name: "HackerRank",
-                  url: "https://www.hackerrank.com/dashboard",
-                  icon: <SiHackerrank />,
-                  color: "emerald",
-                },
-                {
-                  name: "Cisco NetAcad",
-                  url: "https://www.netacad.com/",
-                  icon: <TbWorld />,
-                  color: "red",
-                },
-              ].map((platform, index) => (
-                <a
-                  key={index}
-                  href={platform.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 hover:border-cyan-500 transition-all duration-300 card-hover group"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="text-4xl text-orange-500 group-hover:scale-110 transition-transform">
-                      {platform.icon}
-                    </div>
-                    <h3 className="text-xl font-semibold text-white group-hover:text-cyan-300 transition-colors">
-                      {platform.name}
-                    </h3>
-                  </div>
-                  <p className="text-gray-400 group-hover:text-gray-300 transition-colors">
-                    {platform.name === "Google Skillshop"
-                      ? "Google's official certification platform"
-                      : platform.name === "SoloLearn"
-                      ? "Interactive coding tutorials and certifications"
-                      : platform.name === "CodeSignal"
-                      ? "Programming courses and certification paths"
-                      : platform.name === "LIFE Global"
-                      ? "Leadership and professional development"
-                      : platform.name === "HackerRank"
-                      ? "Coding challenges and skill assessments"
-                      : "Networking and IT certifications"}
-                  </p>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section id="contact" className="mb-20">
-          <div className="glow-border rounded-2xl p-8 bg-gray-900/40 backdrop-blur-sm">
-            <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-              <FaEnvelope className="text-cyan-400" />
-              Get In Touch
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  type: "Email",
-                  value: "zahmad2812@gmail.com",
-                  icon: <FaEnvelope />,
-                  color: "cyan",
-                  href: "mailto:zahmad2812@gmail.com",
-                },
-                {
-                  type: "LinkedIn",
-                  value: "Connect professionally",
-                  icon: <FaLinkedin />,
-                  color: "blue",
-                  href: "https://linkedin.com/in/zubair-ahmed-448041344",
-                },
-                {
-                  type: "GitHub",
-                  value: "View my projects",
-                  icon: <FaGithub />,
-                  color: "gray",
-                  href: "https://github.com/zahmed02",
-                },
-              ].map((contact, index) => (
-                <a
-                  key={index}
-                  href={contact.href}
-                  target={contact.type !== "Email" ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="bg-gradient-to-br from-cyan-800/20 to-cyan-900/20 rounded-xl p-8 text-center hover:from-cyan-800/40 hover:to-cyan-900/40 transition-all duration-300 card-hover group"
-                >
-                  <div className="text-5xl text-cyan-400 mb-6 mx-auto group-hover:scale-110 transition-transform">
-                    {contact.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 text-white">
-                    {contact.type}
-                  </h3>
-                  <p className="text-gray-300 group-hover:text-white transition-colors">
-                    {contact.value}
-                  </p>
-                </a>
-              ))}
-            </div>
-
-            {/* Additional Contact Info */}
-            <div className="mt-12 grid md:grid-cols-2 gap-8">
-              <div className="bg-gray-800/30 rounded-xl p-6">
-                <h4 className="text-lg font-semibold mb-4 text-cyan-300">
-                  Quick Contact
-                </h4>
-                <div className="space-y-3">
-                  <p className="text-gray-300">
-                    Feel free to reach out for collaborations or just a friendly
-                    hello!
-                  </p>
-                  <p className="text-gray-400 text-sm">
-                    Response time: Usually within 24 hours
-                  </p>
-                </div>
-              </div>
-              <div className="bg-gray-800/30 rounded-xl p-6">
-                <h4 className="text-lg font-semibold mb-4 text-cyan-300">
-                  Availability
-                </h4>
-                <div className="space-y-2">
-                  <p className="text-gray-300">
-                    🟢 Open to internship opportunities
-                  </p>
-                  <p className="text-gray-300">
-                    🟢 Available for freelance projects
-                  </p>
-                  <p className="text-gray-300">
-                    🟢 Accepting mentorship requests
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-gray-700/50 text-center text-gray-400">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-16 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"></div>
-            <p className="text-lg">
-              © {new Date().getFullYear()} Zubair Ahmed. All rights reserved.
-            </p>
-            <p className="text-gray-500">
-              Built with Next.js & Tailwind CSS | Deployed on GitHub Pages
-            </p>
-            <div className="flex justify-center space-x-6 mt-4">
-              <a
-                href="https://github.com/zahmed02/zahmed02.github.io"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-cyan-300 transition-colors"
-              >
-                Source Code
-              </a>
-              <a
-                href="/ZA_Resume.pdf"
-                download="Zubair_Ahmed_Resume.pdf"
-                className="hover:text-cyan-300 transition-colors"
-              >
-                Download Resume
-              </a>
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="hover:text-cyan-300 transition-colors"
-              >
-                Back to Top
-              </button>
-            </div>
-          </div>
-        </footer>
-      </div>
-
-      {/* Image Modal - Full Screen View */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
-          onClick={closeModal}
-        >
-          <div
-            className="relative w-full h-full flex flex-col items-center justify-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 md:top-8 md:right-8 text-white hover:text-cyan-300 text-3xl md:text-4xl transition-colors z-50 bg-black/50 rounded-full p-2"
-            >
-              <FaTimes />
-            </button>
-
-            <div className="relative w-full h-full max-w-[90vw] max-h-[90vh] rounded-lg overflow-hidden">
-              <Image
-                src="/procom-event.jpg"
-                alt="Zubair Ahmed - Professional Photo"
-                width={3119}
-                height={4160}
-                className="object-contain w-full h-full"
-                priority
-              />
-            </div>
-
-            <div className="text-center mt-6 text-white">
-              <p className="text-2xl font-bold text-gradient">Zubair Ahmed</p>
-              <p className="text-lg text-gray-300 mt-2">
-                Systems Software Engineer & Full-Stack Developer
-              </p>
-              <button
-                onClick={() => {
-                  const link = document.createElement("a");
-                  link.href = "/procom-event.jpg";
-                  link.download = "Zubair_Ahmed_Professional_Photo.jpg";
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
-                className="mt-4 px-6 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-lg transition-all duration-300 flex items-center gap-2 mx-auto"
-              >
-                <FaDownload /> Download Photo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      <footer className="footer section-wrap"><div className="footer-brand"><span>ZA</span><p>Software developer building at the intersection of systems, AI, and people.</p></div><div className="footer-links"><a href="https://github.com/zahmed02" target="_blank" rel="noreferrer"><GitBranch size={17} /> GitHub</a><a href="https://linkedin.com/in/zubair-ahmed-448041344" target="_blank" rel="noreferrer"><ArrowUpRight size={17} /> LinkedIn</a><a href="mailto:zahmad2812@gmail.com"><Mail size={17} /> Email</a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Zubair Ahmed</span><span className="visitor-count"><Users size={14} /> {visits === null ? "Visitors counted privately" : `${visits.toLocaleString()} visits`}</span><span>Designed & built with care</span></div></footer>
+    </main>
   );
 }
